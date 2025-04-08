@@ -1,7 +1,18 @@
 package be.hepl;
 
+import be.hepl.application._interface;
+
+import javax.swing.*;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
+        // Exécution dans le thread EDT (Event Dispatch Thread)
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new _interface().setVisible(true);
+            }
+        });
     }
 }
+

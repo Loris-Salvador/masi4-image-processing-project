@@ -1,0 +1,337 @@
+package be.hepl.application;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+
+public class Application extends JFrame {
+    private JLabel imageLabel;
+    private BufferedImage currentImage;
+
+    public Application() {
+        // Configuration de la fenêtre principale
+        setTitle("IsilImageProcessing");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1000, 700);
+        setLocationRelativeTo(null);
+
+        // Création des composants
+        JMenuBar menuBar = createMenuBar();
+        setJMenuBar(menuBar);
+
+        imageLabel = new JLabel();
+        imageLabel.setHorizontalAlignment(JLabel.CENTER);
+        JScrollPane scrollPane = new JScrollPane(imageLabel);
+
+        // Ajout des composants à la fenêtre
+        add(scrollPane, BorderLayout.CENTER);
+
+        // Charger une image par défaut (optionnel)
+        // currentImage = ImageIO.read(new File("lena.jpg"));
+        // displayImage(currentImage);
+    }
+
+    private JMenuBar createMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+
+        // Menu Filtrage Linéaire
+        JMenu linearMenu = new JMenu("Filtrage linéaire");
+
+        // Sous-menu Global
+        JMenu globalMenu = new JMenu("Global");
+        globalMenu.add(createMenuItem("Passe-bas idéal", e -> showFrequencyDialog("Passe-bas idéal")));
+        globalMenu.add(createMenuItem("Passe-haut idéal", e -> showFrequencyDialog("Passe-haut idéal")));
+        globalMenu.add(createMenuItem("Passe-bas Butterworth", e -> showButterworthDialog("Passe-bas Butterworth")));
+        globalMenu.add(createMenuItem("Passe-haut Butterworth", e -> showButterworthDialog("Passe-haut Butterworth")));
+        linearMenu.add(globalMenu);
+
+        // Sous-menu Local
+        JMenu localMenu = new JMenu("Local");
+        localMenu.add(createMenuItem("Masque de convolution", e -> showConvolutionDialog()));
+        localMenu.add(createMenuItem("Filtre moyenneur", e -> showAveragingDialog()));
+        linearMenu.add(localMenu);
+
+        menuBar.add(linearMenu);
+
+        // Menu Traitement Non-Linéaire
+        JMenu nonLinearMenu = new JMenu("Traitement non-linéaire");
+
+        // Sous-menu Elémentaire
+        JMenu elementaryMenu = new JMenu("Elémentaire");
+        elementaryMenu.add(createMenuItem("Erosion", e -> showMorphoDialog("Erosion")));
+        elementaryMenu.add(createMenuItem("Dilatation", e -> showMorphoDialog("Dilatation")));
+        elementaryMenu.add(createMenuItem("Ouverture", e -> showMorphoDialog("Ouverture")));
+        elementaryMenu.add(createMenuItem("Fermeture", e -> showMorphoDialog("Fermeture")));
+        nonLinearMenu.add(elementaryMenu);
+
+        // Sous-menu Complexe
+        JMenu complexMenu = new JMenu("Complexe");
+        complexMenu.add(createMenuItem("Dilatation géodésique", e -> showGeodesicDialog("Dilatation")));
+        complexMenu.add(createMenuItem("Reconstruction géodésique", e -> showGeodesicDialog("Reconstruction")));
+        complexMenu.add(createMenuItem("Filtre médian", e -> showMedianDialog()));
+        nonLinearMenu.add(complexMenu);
+
+        menuBar.add(nonLinearMenu);
+
+        // Menu Histogramme
+        JMenu histogramMenu = new JMenu("Histogramme");
+        histogramMenu.add(createMenuItem("Afficher paramètres", e -> showImageParameters()));
+
+        JMenu enhanceMenu = new JMenu("Rehaussement");
+        enhanceMenu.add(createMenuItem("Transformation linéaire", e -> showLinearTransformDialog()));
+        enhanceMenu.add(createMenuItem("Transformation linéaire avec saturation", e -> showSaturationDialog()));
+        enhanceMenu.add(createMenuItem("Correction gamma", e -> showGammaDialog()));
+        enhanceMenu.add(createMenuItem("Négatif", e -> applyNegative()));
+        enhanceMenu.add(createMenuItem("Egalisation", e -> applyHistogramEqualization()));
+        histogramMenu.add(enhanceMenu);
+
+        menuBar.add(histogramMenu);
+
+        // Menu Contours
+        JMenu contoursMenu = new JMenu("Contours");
+
+        JMenu linearContoursMenu = new JMenu("Linéaire");
+        linearContoursMenu.add(createMenuItem("Gradient Prewitt", e -> showPrewittDialog()));
+        linearContoursMenu.add(createMenuItem("Gradient Sobel", e -> showSobelDialog()));
+        linearContoursMenu.add(createMenuItem("Laplacien 4-connexe", e -> applyLaplacian4()));
+        linearContoursMenu.add(createMenuItem("Laplacien 8-connexe", e -> applyLaplacian8()));
+        contoursMenu.add(linearContoursMenu);
+
+        JMenu nonLinearContoursMenu = new JMenu("Non-linéaire");
+        nonLinearContoursMenu.add(createMenuItem("Gradient érosion", e -> applyErosionGradient()));
+        nonLinearContoursMenu.add(createMenuItem("Gradient dilatation", e -> applyDilationGradient()));
+        nonLinearContoursMenu.add(createMenuItem("Gradient Beucher", e -> applyBeucherGradient()));
+        nonLinearContoursMenu.add(createMenuItem("Laplacien non-linéaire", e -> applyNonLinearLaplacian()));
+        contoursMenu.add(nonLinearContoursMenu);
+
+        menuBar.add(contoursMenu);
+
+        // Menu Seuillage
+        JMenu thresholdMenu = new JMenu("Seuillage");
+        thresholdMenu.add(createMenuItem("Seuillage simple", e -> showSimpleThresholdDialog()));
+        thresholdMenu.add(createMenuItem("Seuillage double", e -> showDoubleThresholdDialog()));
+        thresholdMenu.add(createMenuItem("Seuillage automatique", e -> applyAutoThreshold()));
+        menuBar.add(thresholdMenu);
+
+        // Menu Applications
+        JMenu appsMenu = new JMenu("Applications");
+        for (int i = 1; i <= 7; i++) {
+            appsMenu.add(createMenuItem("Application " + i, e -> runApplication(e.getActionCommand())));
+        }
+        menuBar.add(appsMenu);
+
+        // Menu Fichier
+        JMenu fileMenu = new JMenu("Fichier");
+        fileMenu.add(createMenuItem("Ouvrir", e -> openImage()));
+        fileMenu.add(createMenuItem("Enregistrer", e -> saveImage()));
+        fileMenu.addSeparator();
+        fileMenu.add(createMenuItem("Quitter", e -> System.exit(0)));
+        menuBar.add(fileMenu);
+
+        return menuBar;
+    }
+
+    private JMenuItem createMenuItem(String text, ActionListener listener) {
+        JMenuItem item = new JMenuItem(text);
+        item.addActionListener(listener);
+        return item;
+    }
+
+    // Méthodes pour afficher les différentes boîtes de dialogue
+    private void showFrequencyDialog(String filterType) {
+        JSpinner freqSpinner = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
+
+        Object[] message = {
+                "Fréquence de coupure:", freqSpinner
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, filterType,
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (option == JOptionPane.OK_OPTION) {
+            int frequency = (Integer)freqSpinner.getValue();
+            // Appeler la méthode de filtrage appropriée
+            // currentImage = FiltrageLineaireGlobal.filtrePasseBasIdeal(currentImage, frequency);
+            displayImage(currentImage);
+        }
+    }
+
+    private void showButterworthDialog(String filterType) {
+        JSpinner freqSpinner = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
+        JSpinner orderSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
+
+        Object[] message = {
+                "Fréquence de coupure:", freqSpinner,
+                "Ordre du filtre:", orderSpinner
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, filterType,
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (option == JOptionPane.OK_OPTION) {
+            int frequency = (Integer)freqSpinner.getValue();
+            int order = (Integer)orderSpinner.getValue();
+            // Appeler la méthode de filtrage appropriée
+            // currentImage = FiltrageLineaireGlobal.filtrePasseBasButterworth(currentImage, frequency, order);
+            displayImage(currentImage);
+        }
+    }
+
+    private void showConvolutionDialog() {
+        JTextArea maskArea = new JTextArea(5, 10);
+        maskArea.setText("1 1 1\n1 1 1\n1 1 1");
+
+        Object[] message = {
+                "Entrez le masque de convolution (une ligne par rangée, valeurs séparées par des espaces):",
+                new JScrollPane(maskArea)
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Masque de convolution",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (option == JOptionPane.OK_OPTION) {
+            try {
+                String[] rows = maskArea.getText().split("\n");
+                double[][] mask = new double[rows.length][];
+
+                for (int i = 0; i < rows.length; i++) {
+                    String[] values = rows[i].trim().split("\\s+");
+                    mask[i] = new double[values.length];
+                    for (int j = 0; j < values.length; j++) {
+                        mask[i][j] = Double.parseDouble(values[j]);
+                    }
+                }
+
+                // Convertir en tableau 1D si nécessaire
+                // currentImage = FiltrageLineaireLocal.filtreMasqueConvolution(currentImage, mask);
+                displayImage(currentImage);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Format de masque invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void showAveragingDialog() {
+        JSpinner sizeSpinner = new JSpinner(new SpinnerNumberModel(3, 3, 15, 2));
+
+        Object[] message = {
+                "Taille du masque (n x n, n impair):", sizeSpinner
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Filtre moyenneur",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (option == JOptionPane.OK_OPTION) {
+            int size = (Integer)sizeSpinner.getValue();
+            // currentImage = FiltrageLineaireLocal.filtreMoyenneur(currentImage, size);
+            displayImage(currentImage);
+        }
+    }
+
+    private void showMorphoDialog(String operation) {
+        JSpinner sizeSpinner = new JSpinner(new SpinnerNumberModel(3, 3, 15, 2));
+
+        Object[] message = {
+                "Taille de l'élément structurant (n x n, n impair):", sizeSpinner
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, operation,
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (option == JOptionPane.OK_OPTION) {
+            int size = (Integer)sizeSpinner.getValue();
+            /*
+            switch (operation) {
+                case "Erosion":
+                    currentImage = MorphoElementaire.erosion(currentImage, size);
+                    break;
+                case "Dilatation":
+                    currentImage = MorphoElementaire.dilatation(currentImage, size);
+                    break;
+                case "Ouverture":
+                    currentImage = MorphoElementaire.ouverture(currentImage, size);
+                    break;
+                case "Fermeture":
+                    currentImage = MorphoElementaire.fermeture(currentImage, size);
+                    break;
+            }
+            */
+            displayImage(currentImage);
+        }
+    }
+
+    private void openImage() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Ouvrir une image");
+
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            try {
+                // currentImage = ImageIO.read(fileChooser.getSelectedFile());
+                displayImage(currentImage);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Erreur lors du chargement de l'image",
+                        "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void saveImage() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image à enregistrer",
+                    "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Enregistrer l'image");
+
+        if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            try {
+                // ImageIO.write(currentImage, "png", fileChooser.getSelectedFile());
+                JOptionPane.showMessageDialog(this, "Image enregistrée avec succès");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Erreur lors de l'enregistrement",
+                        "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void displayImage(BufferedImage image) {
+        if (image != null) {
+            ImageIcon icon = new ImageIcon(image);
+            imageLabel.setIcon(icon);
+            pack();
+        }
+    }
+
+    // Méthodes pour les autres fonctionnalités (à compléter)
+    private void showGeodesicDialog(String operation) {}
+    private void showMedianDialog() {}
+    private void showImageParameters() {}
+    private void showLinearTransformDialog() {}
+    private void showSaturationDialog() {}
+    private void showGammaDialog() {}
+    private void applyNegative() {}
+    private void applyHistogramEqualization() {}
+    private void showPrewittDialog() {}
+    private void showSobelDialog() {}
+    private void applyLaplacian4() {}
+    private void applyLaplacian8() {}
+    private void applyErosionGradient() {}
+    private void applyDilationGradient() {}
+    private void applyBeucherGradient() {}
+    private void applyNonLinearLaplacian() {}
+    private void showSimpleThresholdDialog() {}
+    private void showDoubleThresholdDialog() {}
+    private void applyAutoThreshold() {}
+    private void runApplication(String appNumber) {}
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            Application app = new Application();
+            app.setVisible(true);
+        });
+    }
+}

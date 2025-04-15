@@ -314,16 +314,17 @@ public class Application extends JFrame {
     // Méthodes pour les autres fonctionnalités (à compléter)
     private void showGeodesicDialog(String operation) {}
     private void showMedianDialog() {}
-    private void showImageParameters() //étape 3
-    {
-        if (currentImage == null)
-        {
+    private void showImageParameters() {
+        if (currentImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Convertir BufferedImage en matrice int[][]
         int[][] imageMatrix = convertToMatrix(currentImage);
+
+        // Afficher l'histogramme avant
+        int[] histAvant = Histogramme.Histogramme256(imageMatrix);
+        afficherHistogramme(histAvant, "Histogramme original");
 
         int min = Histogramme.minimum(imageMatrix);
         int max = Histogramme.maximum(imageMatrix);
@@ -340,37 +341,199 @@ public class Application extends JFrame {
 
         JOptionPane.showMessageDialog(this, message, "Paramètres de l'image", JOptionPane.INFORMATION_MESSAGE);
     }
-    private void showLinearTransformDialog() {}
-    private void showSaturationDialog() {}
-    private void showGammaDialog() {}
-    private void applyNegative() //étape 3
-    {
+
+    private void showLinearTransformDialog() {
         if (currentImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         int[][] imageMatrix = convertToMatrix(currentImage);
-        int[] courbe = Histogramme.creeCourbeTonaleNegatif();
+
+        // Afficher histogramme avant
+        int[] histAvant = Histogramme.Histogramme256(imageMatrix);
+        afficherHistogramme(histAvant, "Avant transformation linéaire");
+
+        int min = Histogramme.minimum(imageMatrix);
+        int max = Histogramme.maximum(imageMatrix);
+
+        int[] courbe = Histogramme.creeCourbeTonaleLineaireSaturation(min, max);
         int[][] result = Histogramme.rehaussement(imageMatrix, courbe);
+
+        // Afficher histogramme après
+        int[] histApres = Histogramme.Histogramme256(result);
+        afficherHistogramme(histApres, "Après transformation linéaire");
 
         currentImage = convertToBufferedImage(result);
         displayImage(currentImage);
     }
 
-    private void applyHistogramEqualization() //étape 3
-    {
+    private void showSaturationDialog() {
         if (currentImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         int[][] imageMatrix = convertToMatrix(currentImage);
-        int[] courbe = Histogramme.creeCourbeTonaleEgalisation(imageMatrix);
+
+        // Afficher histogramme avant
+        int[] histAvant = Histogramme.Histogramme256(imageMatrix);
+        afficherHistogramme(histAvant, "Avant saturation");
+
+        int min = Histogramme.minimum(imageMatrix);
+        int max = Histogramme.maximum(imageMatrix);
+
+        JSpinner minSpinner = new JSpinner(new SpinnerNumberModel(min, 0, max-1, 1));
+        JSpinner maxSpinner = new JSpinner(new SpinnerNumberModel(max, min+1, 255, 1));
+
+        Object[] message = {
+                "Valeur minimale (smin):", minSpinner,
+                "Valeur maximale (smax):", maxSpinner
+        };
+
+        int option = JOptionPane.showConfirmDialog(
+                this,
+                message,
+                "Transformation linéaire avec saturation",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (option == JOptionPane.OK_OPTION) {
+            int smin = (Integer) minSpinner.getValue();
+            int smax = (Integer) maxSpinner.getValue();
+            int[] courbe = Histogramme.creeCourbeTonaleLineaireSaturation(smin, smax);
+            int[][] result = Histogramme.rehaussement(imageMatrix, courbe);
+
+            // Afficher histogramme après
+            int[] histApres = Histogramme.Histogramme256(result);
+            afficherHistogramme(histApres, "Après saturation");
+
+            currentImage = convertToBufferedImage(result);
+            displayImage(currentImage);
+        }
+    }
+
+    private void showGammaDialog() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int[][] imageMatrix = convertToMatrix(currentImage);
+
+        // Afficher histogramme avant
+        int[] histAvant = Histogramme.Histogramme256(imageMatrix);
+        afficherHistogramme(histAvant, "Avant correction gamma");
+
+        JSpinner gammaSpinner = new JSpinner(new SpinnerNumberModel(1.0, 0.1, 5.0, 0.1));
+
+        Object[] message = {"Valeur gamma (0.1-5.0):", gammaSpinner};
+
+        if (JOptionPane.showConfirmDialog(
+                this,
+                message,
+                "Correction Gamma",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+        ) == JOptionPane.OK_OPTION) {
+
+            double gamma = (Double) gammaSpinner.getValue();
+            int[] courbe = Histogramme.creeCourbeTonaleGamma(gamma);
+            int[][] result = Histogramme.rehaussement(imageMatrix, courbe);
+
+            // Afficher histogramme après
+            int[] histApres = Histogramme.Histogramme256(result);
+            afficherHistogramme(histApres, "Après correction gamma");
+
+            currentImage = convertToBufferedImage(result);
+            displayImage(currentImage);
+        }
+    }
+
+    private void applyNegative() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int[][] imageMatrix = convertToMatrix(currentImage);
+
+        // Afficher histogramme avant
+        int[] histAvant = Histogramme.Histogramme256(imageMatrix);
+        afficherHistogramme(histAvant, "Avant négatif");
+
+        int[] courbe = Histogramme.creeCourbeTonaleNegatif();
         int[][] result = Histogramme.rehaussement(imageMatrix, courbe);
+
+        // Afficher histogramme après
+        int[] histApres = Histogramme.Histogramme256(result);
+        afficherHistogramme(histApres, "Après négatif");
 
         currentImage = convertToBufferedImage(result);
         displayImage(currentImage);
+    }
+
+    private void applyHistogramEqualization() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int[][] imageMatrix = convertToMatrix(currentImage);
+
+        // Afficher histogramme avant
+        int[] histAvant = Histogramme.Histogramme256(imageMatrix);
+        afficherHistogramme(histAvant, "Avant égalisation");
+
+        int[] courbe = Histogramme.creeCourbeTonaleEgalisation(imageMatrix);
+        int[][] result = Histogramme.rehaussement(imageMatrix, courbe);
+
+        // Afficher histogramme après
+        int[] histApres = Histogramme.Histogramme256(result);
+        afficherHistogramme(histApres, "Après égalisation");
+
+        currentImage = convertToBufferedImage(result);
+        displayImage(currentImage);
+    }
+
+    // Méthode utilitaire pour afficher un histogramme
+    private void afficherHistogramme(int[] hist, String titre) {
+        int histWidth = 512;
+        int histHeight = 400;
+        BufferedImage histImage = new BufferedImage(histWidth, histHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = histImage.createGraphics();
+
+        // Fond blanc
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, histWidth, histHeight);
+
+        // Trouver le max pour la mise à l'échelle
+        int maxCount = 0;
+        for (int count : hist) {
+            if (count > maxCount) maxCount = count;
+        }
+
+        // Dessiner l'histogramme
+        g2d.setColor(Color.BLUE);
+        int binWidth = histWidth / 256;
+        for (int i = 0; i < 256; i++) {
+            int height = (int)(((double)hist[i] / maxCount) * (histHeight - 20));
+            g2d.fillRect(i * binWidth, histHeight - height, binWidth, height);
+        }
+
+        // Ajouter des étiquettes
+        g2d.setColor(Color.BLACK);
+        g2d.drawString(titre, 10, 20);
+        g2d.drawString("0", 5, histHeight - 5);
+        g2d.drawString("255", histWidth - 30, histHeight - 5);
+
+        // Afficher dans une fenêtre
+        JFrame frame = new JFrame("Histogramme - " + titre);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.add(new JLabel(new ImageIcon(histImage)));
+        frame.pack();
+        frame.setVisible(true);
     }
     private void showPrewittDialog() {}
     private void showSobelDialog() {}

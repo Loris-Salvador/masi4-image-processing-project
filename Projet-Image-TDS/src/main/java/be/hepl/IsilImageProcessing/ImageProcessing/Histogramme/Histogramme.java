@@ -1,5 +1,9 @@
 package be.hepl.IsilImageProcessing.ImageProcessing.Histogramme;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
 public class Histogramme {
 
     public static int[] Histogramme256(int mat[][])
@@ -81,12 +85,15 @@ public class Histogramme {
         return (max == 0 && min == 0) ? 0 : (double)(max - min) / (max + min);
     }
 
-    public static int[][] rehaussement(int[][] image, int[] courbeTonale) {
+
+    public static int[][] rehaussement(int[][] image, int[] courbeTonale)
+    {
         int width = image.length;
         int height = image[0].length;
         int[][] result = new int[width][height];
 
-        for (int i = 0; i < width; i++) {
+        for (int i = 0; i < width; i++)
+        {
             for (int j = 0; j < height; j++) {
                 int pixel = Math.max(0, Math.min(255, image[i][j]));
                 result[i][j] = courbeTonale[pixel];
@@ -109,6 +116,7 @@ public class Histogramme {
         return courbe;
     }
 
+    //Sert à rendre l’image plus claire ou plus foncée rn fct du gamma choisi
     public static int[] creeCourbeTonaleGamma(double gamma) {
         int[] courbe = new int[256];
         for (int i = 0; i < 256; i++) {
@@ -117,7 +125,8 @@ public class Histogramme {
         return courbe;
     }
 
-    public static int[] creeCourbeTonaleNegatif() {
+    public static int[] creeCourbeTonaleNegatif()
+    {
         int[] courbe = new int[256];
         for (int i = 0; i < 256; i++) {
             courbe[i] = 255 - i;
@@ -139,4 +148,6 @@ public class Histogramme {
 
         return courbe;
     }
+
+
 }

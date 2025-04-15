@@ -18,6 +18,7 @@ public class Histogramme {
     }
 
     // Méthodes pour l'étape 3
+    //Parcourt l’image pour trouver le pixel le plus sombre, plus petit niveau de gris
     public static int minimum(int[][] image) {
         int min = 255;
         for (int[] row : image) {
@@ -30,6 +31,7 @@ public class Histogramme {
         return min;
     }
 
+    //Parcourt l’image pour trouver le pixel le plus clair, plus grand niveau de gris
     public static int maximum(int[][] image) {
         int max = 0;
         for (int[] row : image) {
@@ -42,6 +44,8 @@ public class Histogramme {
         return max;
     }
 
+    //Parcourt l’image pour calculer la luminance, moyenne des niveaux de gris
+    //"quelle est la lumière générale de l’image"
     public static int luminance(int[][] image) {
         long sum = 0;
         int count = 0;
@@ -54,19 +58,23 @@ public class Histogramme {
         return count == 0 ? 0 : (int)(sum / count);
     }
 
-    public static double contraste1(int[][] image) {
-        int lum = luminance(image);
-        long sum = 0;
-        int count = 0;
+    //Parcourt l’image pour calculer le contraste, écart-type des niveaux de gris
+    //Plus l’écart-type est grand, plus l’image a des zones très claires et très sombres
+    public static double contraste1(int[][] image)  //
+    {
+        int lum = luminance(image); // moyenne
+        long sum = 0; // somme (xᵢ - μ)²
+        int count = 0; //N
         for (int[] row : image) {
             for (int pixel : row) {
-                sum += (pixel - lum) * (pixel - lum);
+                sum += (long) (pixel - lum) * (pixel - lum); // (xᵢ - μ)²
                 count++;
             }
         }
-        return count == 0 ? 0 : Math.sqrt((double)sum / count);
+        return count == 0 ? 0 : Math.sqrt((double)sum / count); // ecart-type
     }
 
+    //méthode + simple pour calculer le contraste => Contraste = (max - min) / (max + min)
     public static double contraste2(int[][] image) {
         int min = minimum(image);
         int max = maximum(image);

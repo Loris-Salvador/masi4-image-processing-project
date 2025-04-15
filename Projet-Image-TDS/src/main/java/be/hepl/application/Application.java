@@ -1,10 +1,16 @@
 package be.hepl.application;
 
+import be.hepl.IsilImageProcessing.ImageProcessing.Histogramme.Histogramme;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+
+import static be.hepl.IsilImageProcessing.ImageProcessing.Step3Utils.convertToBufferedImage;
+import static be.hepl.IsilImageProcessing.ImageProcessing.Step3Utils.convertToMatrix;
 
 public class Application extends JFrame {
     private JLabel imageLabel;
@@ -53,7 +59,6 @@ public class Application extends JFrame {
         localMenu.add(createMenuItem("Filtre moyenneur", e -> showAveragingDialog()));
         linearMenu.add(localMenu);
 
-        menuBar.add(linearMenu);
 
         // Menu Traitement Non-Linéaire
         JMenu nonLinearMenu = new JMenu("Traitement non-linéaire");
@@ -268,7 +273,7 @@ public class Application extends JFrame {
 
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             try {
-                // currentImage = ImageIO.read(fileChooser.getSelectedFile());
+                currentImage = ImageIO.read(fileChooser.getSelectedFile());
                 displayImage(currentImage);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Erreur lors du chargement de l'image",
@@ -309,12 +314,64 @@ public class Application extends JFrame {
     // Méthodes pour les autres fonctionnalités (à compléter)
     private void showGeodesicDialog(String operation) {}
     private void showMedianDialog() {}
-    private void showImageParameters() {}
+    private void showImageParameters() //étape 3
+    {
+        if (currentImage == null)
+        {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Convertir BufferedImage en matrice int[][]
+        int[][] imageMatrix = convertToMatrix(currentImage);
+
+        int min = Histogramme.minimum(imageMatrix);
+        int max = Histogramme.maximum(imageMatrix);
+        int lum = Histogramme.luminance(imageMatrix);
+        double cont1 = Histogramme.contraste1(imageMatrix);
+        double cont2 = Histogramme.contraste2(imageMatrix);
+
+        String message = String.format(
+                "Paramètres de l'image:\n" +
+                        "Minimum: %d\nMaximum: %d\nLuminance: %d\n" +
+                        "Contraste (écart-type): %.2f\nContraste (alternatif): %.2f",
+                min, max, lum, cont1, cont2
+        );
+
+        JOptionPane.showMessageDialog(this, message, "Paramètres de l'image", JOptionPane.INFORMATION_MESSAGE);
+    }
     private void showLinearTransformDialog() {}
     private void showSaturationDialog() {}
     private void showGammaDialog() {}
-    private void applyNegative() {}
-    private void applyHistogramEqualization() {}
+    private void applyNegative() //étape 3
+    {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int[][] imageMatrix = convertToMatrix(currentImage);
+        int[] courbe = Histogramme.creeCourbeTonaleNegatif();
+        int[][] result = Histogramme.rehaussement(imageMatrix, courbe);
+
+        currentImage = convertToBufferedImage(result);
+        displayImage(currentImage);
+    }
+
+    private void applyHistogramEqualization() //étape 3
+    {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int[][] imageMatrix = convertToMatrix(currentImage);
+        int[] courbe = Histogramme.creeCourbeTonaleEgalisation(imageMatrix);
+        int[][] result = Histogramme.rehaussement(imageMatrix, courbe);
+
+        currentImage = convertToBufferedImage(result);
+        displayImage(currentImage);
+    }
     private void showPrewittDialog() {}
     private void showSobelDialog() {}
     private void applyLaplacian4() {}

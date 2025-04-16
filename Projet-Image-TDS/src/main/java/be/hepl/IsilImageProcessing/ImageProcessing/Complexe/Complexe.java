@@ -5,7 +5,7 @@ public class Complexe
     private double partieReelle;
     private double partieImaginaire;
     
-    /** Creates a new instance of Complexe */
+
     public Complexe(double pr,double pi) 
     {
         partieReelle = pr;

@@ -6,8 +6,7 @@ public class MatriceComplexe
     private int       lignes;
     private int       colonnes;
     
-    /** Creates a new instance of MatriceComplexe */
-    public MatriceComplexe(int l,int c) 
+    public MatriceComplexe(int l,int c)
     {
         lignes = l;
         colonnes = c;

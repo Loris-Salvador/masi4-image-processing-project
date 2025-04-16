@@ -1,4 +1,4 @@
-package be.hepl.IsilImageProcessing.Complex;
+package be.hepl.IsilImageProcessing.ImageProcessing.Complexe;
 
 public class Complex {
     double real;

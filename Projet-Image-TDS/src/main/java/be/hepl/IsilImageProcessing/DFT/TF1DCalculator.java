@@ -1,6 +1,6 @@
 package be.hepl.IsilImageProcessing.DFT;
 
-import be.hepl.IsilImageProcessing.Complex.Complex;
+import be.hepl.IsilImageProcessing.ImageProcessing.Complexe.Complex;
 
 
 public class TF1DCalculator{

@@ -1,6 +1,6 @@
 package be.hepl.IsilImageProcessing.FiltrePasseBas;
 
-import be.hepl.IsilImageProcessing.Complex.Complex;
+import be.hepl.IsilImageProcessing.ImageProcessing.Complexe.Complex;
 import be.hepl.IsilImageProcessing.DFT.TF2DCalulator;
 
 public class FiltrePasseBasIdeal {

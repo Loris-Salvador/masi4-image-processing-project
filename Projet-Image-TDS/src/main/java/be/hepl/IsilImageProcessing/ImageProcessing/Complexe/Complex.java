@@ -1,5 +1,5 @@
 package be.hepl.IsilImageProcessing.ImageProcessing.Complexe;
-
+// class Complex de Florian
 public class Complex {
     double real;
     double imag;
@@ -10,6 +10,7 @@ public class Complex {
     }
 
     public Complex add(Complex other) {
+
         return new Complex(this.real + other.real, this.imag + other.imag);
     }
 
@@ -33,5 +34,17 @@ public class Complex {
 
     public double getImaginary() {
         return imag;
+    }
+
+    public Complex conjugate() {
+        return new Complex(real, -imag);
+    }
+
+    public double getModule() {
+        return Math.sqrt(real * real + imag * imag);
+    }
+
+    public double getPhase() {
+        return Math.atan2(imag, real);
     }
 }

@@ -1,6 +1,7 @@
 package be.hepl.application;
 
 import be.hepl.IsilImageProcessing.ImageProcessing.Histogramme.Histogramme;
+import be.hepl.IsilImageProcessing.NonLineaire.MorphoElementaire;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -145,7 +146,8 @@ public class Application extends JFrame {
     }
 
     // Méthodes pour afficher les différentes boîtes de dialogue
-    private void showFrequencyDialog(String filterType) {
+    private void showFrequencyDialog(String filterType)
+    {
         JSpinner freqSpinner = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
 
         Object[] message = {
@@ -235,36 +237,39 @@ public class Application extends JFrame {
         }
     }
 
-    private void showMorphoDialog(String operation) {
-        JSpinner sizeSpinner = new JSpinner(new SpinnerNumberModel(3, 3, 15, 2));
-
-        Object[] message = {
-                "Taille de l'élément structurant (n x n, n impair):", sizeSpinner
-        };
-
-        int option = JOptionPane.showConfirmDialog(this, message, operation,
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-        if (option == JOptionPane.OK_OPTION) {
-            int size = (Integer)sizeSpinner.getValue();
-            /*
-            switch (operation) {
-                case "Erosion":
-                    currentImage = MorphoElementaire.erosion(currentImage, size);
-                    break;
-                case "Dilatation":
-                    currentImage = MorphoElementaire.dilatation(currentImage, size);
-                    break;
-                case "Ouverture":
-                    currentImage = MorphoElementaire.ouverture(currentImage, size);
-                    break;
-                case "Fermeture":
-                    currentImage = MorphoElementaire.fermeture(currentImage, size);
-                    break;
-            }
-            */
-            displayImage(currentImage);
+    private void showMorphoDialog(String operation)
+    {
+        if (currentImage == null)
+        {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
         }
+        int[][] mat = convertToMatrix(currentImage);
+        JSpinner sizeSpinner = new JSpinner(new SpinnerNumberModel(3, 3, 31, 2));
+        Object[] message = {"Taille de l'élément structurant (impair):", sizeSpinner};
+        int option = JOptionPane.showConfirmDialog(this, message, operation, JOptionPane.OK_CANCEL_OPTION);
+        if (option != JOptionPane.OK_OPTION) return;
+        int taille = (Integer) sizeSpinner.getValue();
+        int[][] result;
+        switch (operation)
+        {
+            case "Erosion":
+                result = MorphoElementaire.erosion(mat, taille);
+                break;
+            case "Dilatation":
+                result = MorphoElementaire.dilatation(mat, taille);
+                break;
+            case "Ouverture":
+                result = MorphoElementaire.ouverture(mat, taille);
+                break;
+            case "Fermeture":
+                result = MorphoElementaire.fermeture(mat, taille);
+                break;
+            default:
+                return;
+        }
+        currentImage = convertToBufferedImage(result);
+        displayImage(currentImage);
     }
 
     private void openImage() {
@@ -368,8 +373,10 @@ public class Application extends JFrame {
         displayImage(currentImage);
     }
 
-    private void showSaturationDialog() {
-        if (currentImage == null) {
+    private void showSaturationDialog()
+    {
+        if (currentImage == null)
+        {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -386,7 +393,8 @@ public class Application extends JFrame {
         JSpinner minSpinner = new JSpinner(new SpinnerNumberModel(min, 0, max-1, 1));
         JSpinner maxSpinner = new JSpinner(new SpinnerNumberModel(max, min+1, 255, 1));
 
-        Object[] message = {
+        Object[] message =
+                {
                 "Valeur minimale (smin):", minSpinner,
                 "Valeur maximale (smax):", maxSpinner
         };
@@ -399,7 +407,8 @@ public class Application extends JFrame {
                 JOptionPane.PLAIN_MESSAGE
         );
 
-        if (option == JOptionPane.OK_OPTION) {
+        if (option == JOptionPane.OK_OPTION)
+        {
             int smin = (Integer) minSpinner.getValue();
             int smax = (Integer) maxSpinner.getValue();
             int[] courbe = Histogramme.creeCourbeTonaleLineaireSaturation(smin, smax);
@@ -415,7 +424,8 @@ public class Application extends JFrame {
     }
 
     private void showGammaDialog() {
-        if (currentImage == null) {
+        if (currentImage == null)
+        {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -451,7 +461,8 @@ public class Application extends JFrame {
         }
     }
 
-    private void applyNegative() {
+    private void applyNegative()
+    {
         if (currentImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
@@ -474,7 +485,8 @@ public class Application extends JFrame {
         displayImage(currentImage);
     }
 
-    private void applyHistogramEqualization() {
+    private void applyHistogramEqualization()
+    {
         if (currentImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
@@ -498,7 +510,8 @@ public class Application extends JFrame {
     }
 
     // Méthode utilitaire pour afficher un histogramme
-    private void afficherHistogramme(int[] hist, String titre) {
+    private void afficherHistogramme(int[] hist, String titre)
+    {
         int histWidth = 512;
         int histHeight = 400;
         BufferedImage histImage = new BufferedImage(histWidth, histHeight, BufferedImage.TYPE_INT_RGB);

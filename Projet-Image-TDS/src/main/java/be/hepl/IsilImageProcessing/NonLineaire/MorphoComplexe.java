@@ -4,33 +4,51 @@ import java.util.Arrays;
 
 public class MorphoComplexe
 {
-    // Geodesic dilation: iterate dilation but mask by geodesic
-    public static int[][] dilatationGeodesique(int[][] image, int[][] geodesicMask, int nbIter)
-    {
-        int[][] marker = copy(image);
-        for (int i = 0; i < nbIter; i++)
-        {
-            marker = dilateOnce(marker);
-            marker = pointwiseMin(marker, geodesicMask);
+    public static int[][] dilatationGeodesique(int[][] image, int[][] masqueGeodesique, int nbIter) {
+        int[][] marqueur = copy(image);
+
+        for (int i = 0; i < nbIter; i++) {
+            marqueur = dilateOnce(marqueur);
+            marqueur = intersection(marqueur, masqueGeodesique);
         }
-        return marker;
+        return marqueur;
     }
 
-    // Reconstruction geodesique: iterate until stability
-    public static int[][] reconstructionGeodesique(int[][] image, int[][] geodesicMask)
-    {
-        int[][] marker = copy(image);
-        while (true)
+    /*public static int[][] reconstructionGeodesique(int[][] image, int[][] masqueGeodesique) {
+        int[][] marqueur = copy(image);
+        int[][] precedent;
+
+        do {
+            precedent = copy(marqueur);
+            marqueur = dilateOnce(marqueur);
+            marqueur = intersection(marqueur, masqueGeodesique);
+        } while (!Arrays.deepEquals(precedent, marqueur));
+
+        return marqueur;
+    }*/
+
+    public static int[][] reconstructionGeodesique(int[][] image, int[][] masqueGeodesique) {
+        // Validation des entrées
+        if (image.length != masqueGeodesique.length || image[0].length != masqueGeodesique[0].length)
         {
-            int[][] prev = marker;
-            marker = dilateOnce(marker);
-            marker = pointwiseMin(marker, geodesicMask);
-            if (Arrays.deepEquals(prev, marker)) break;
+            throw new IllegalArgumentException("Image et masque doivent avoir la même taille.");
         }
-        return marker;
+
+        int[][] marqueur = copy(image);
+        int[][] precedent;
+        int iter = 0;
+        int maxIter = 1000; // Sécurité anti-boucle infinie
+
+        do
+        {
+            precedent = copy(marqueur);
+            marqueur = intersection(dilateOnce(marqueur), masqueGeodesique);
+            iter++;
+        } while (!Arrays.deepEquals(precedent, marqueur) && iter < maxIter);
+
+        return marqueur;
     }
 
-    // Median filter over nxn neighborhood
     public static int[][] filtreMedian(int[][] image, int tailleMasque)
     {
         int height = image.length;
@@ -65,12 +83,22 @@ public class MorphoComplexe
         return MorphoElementaire.dilatation(img, 3);
     }
 
-    private static int[][] copy(int[][] src)
+    private static int[][] intersection(int[][] a, int[][] b)
     {
-        int h = src.length, w = src[0].length;
-        int[][] dst = new int[h][w];
-        for (int i = 0; i < h; i++) System.arraycopy(src[i], 0, dst[i], 0, w);
-        return dst;
+        int[][] res = new int[a.length][a[0].length];
+        for (int i = 0; i < a.length; i++)
+        {
+            for (int j = 0; j < a[0].length; j++)
+            {
+                res[i][j] = Math.min(a[i][j], b[i][j]);
+            }
+        }
+        return res;
+    }
+
+    private static int[][] copy(int[][] matrix)
+    {
+        return Arrays.stream(matrix).map(int[]::clone).toArray(int[][]::new);
     }
 
     private static int[][] pointwiseMin(int[][] a, int[][] b)

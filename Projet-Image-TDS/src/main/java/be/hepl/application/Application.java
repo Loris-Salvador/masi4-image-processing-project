@@ -1,6 +1,7 @@
 package be.hepl.application;
 
 import be.hepl.IsilImageProcessing.ImageProcessing.Histogramme.Histogramme;
+import be.hepl.IsilImageProcessing.NonLineaire.MorphoComplexe;
 import be.hepl.IsilImageProcessing.NonLineaire.MorphoElementaire;
 
 import javax.imageio.ImageIO;
@@ -9,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 import static be.hepl.IsilImageProcessing.ImageProcessing.Step3Utils.convertToBufferedImage;
 import static be.hepl.IsilImageProcessing.ImageProcessing.Step3Utils.convertToMatrix;
@@ -299,7 +301,7 @@ public class Application extends JFrame {
 
         if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             try {
-                // ImageIO.write(currentImage, "png", fileChooser.getSelectedFile());
+                ImageIO.write(currentImage, "png", fileChooser.getSelectedFile());
                 JOptionPane.showMessageDialog(this, "Image enregistrée avec succès");
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Erreur lors de l'enregistrement",
@@ -317,10 +319,65 @@ public class Application extends JFrame {
     }
 
     // Méthodes pour les autres fonctionnalités (à compléter)
-    private void showGeodesicDialog(String operation) {}
+    private void showGeodesicDialog(String operation) {
+        if (currentImage == null)
+        {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+
+        JFileChooser chooser = new JFileChooser();
+        if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
+
+        try {
+            BufferedImage maskImage = ImageIO.read(chooser.getSelectedFile());
+
+
+            if (maskImage.getWidth() != currentImage.getWidth() ||
+                    maskImage.getHeight() != currentImage.getHeight())
+            {
+                JOptionPane.showMessageDialog(this,
+                        "Le masque doit avoir la même taille que l'image originale",
+                        "Erreur", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            int[][] masque = convertToMatrix(maskImage);
+            int[][] image = convertToMatrix(currentImage);
+            int[][] result;
+
+            if (operation.equals("Dilatation"))
+            {
+                JSpinner iterSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
+                Object[] message = {"Nombre d'itérations:", iterSpinner};
+                if (JOptionPane.showConfirmDialog(this, message, operation,
+                        JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)
+                {
+                    int nbIter = (Integer) iterSpinner.getValue();
+                    result = MorphoComplexe.dilatationGeodesique(image, masque, nbIter);
+                } else return;
+            }
+            else
+            {
+                result = MorphoComplexe.reconstructionGeodesique(image, masque);
+            }
+
+
+            currentImage = convertToBufferedImage(result);
+            displayImage(currentImage);
+
+        }
+        catch (IOException e)
+        {
+            JOptionPane.showMessageDialog(this,
+                    "Erreur de chargement du masque", "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+    }
     private void showMedianDialog() {}
     private void showImageParameters() {
-        if (currentImage == null) {
+        if (currentImage == null)
+        {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -348,7 +405,8 @@ public class Application extends JFrame {
     }
 
     private void showLinearTransformDialog() {
-        if (currentImage == null) {
+        if (currentImage == null)
+        {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }

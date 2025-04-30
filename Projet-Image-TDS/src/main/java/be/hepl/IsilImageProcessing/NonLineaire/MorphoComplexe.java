@@ -1,36 +1,62 @@
 package be.hepl.IsilImageProcessing.NonLineaire;
 
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
 public class MorphoComplexe
 {
-    // Geodesic dilation: iterate dilation but mask by geodesic
-    public static int[][] dilatationGeodesique(int[][] image, int[][] geodesicMask, int nbIter)
-    {
-        int[][] marker = copy(image);
-        for (int i = 0; i < nbIter; i++)
+    public static int[][] dilatationGeodesique(int[][] image, int[][] masqueGeodesique, int nbIter) {
+        int[][] marqueur = copy(image);
+
+        if (nbIter < 1)
         {
-            marker = dilateOnce(marker);
-            marker = pointwiseMin(marker, geodesicMask);
+            throw new IllegalArgumentException("Le nombre d'itérations doit être >= 1.");
         }
-        return marker;
+
+        for (int i = 0; i < nbIter; i++) {
+            marqueur = dilateOnce(marqueur);
+            marqueur = intersection(marqueur, masqueGeodesique);
+        }
+        return marqueur;
     }
 
-    // Reconstruction geodesique: iterate until stability
-    public static int[][] reconstructionGeodesique(int[][] image, int[][] geodesicMask)
-    {
-        int[][] marker = copy(image);
-        while (true)
+    /*public static int[][] reconstructionGeodesique(int[][] image, int[][] masqueGeodesique) {
+        int[][] marqueur = copy(image);
+        int[][] precedent;
+
+        do {
+            precedent = copy(marqueur);
+            marqueur = dilateOnce(marqueur);
+            marqueur = intersection(marqueur, masqueGeodesique);
+        } while (!Arrays.deepEquals(precedent, marqueur));
+
+        return marqueur;
+    }*/
+
+    public static int[][] reconstructionGeodesique(int[][] image, int[][] masqueGeodesique) {
+        // Validation des entrées
+        if (image.length != masqueGeodesique.length || image[0].length != masqueGeodesique[0].length)
         {
-            int[][] prev = marker;
-            marker = dilateOnce(marker);
-            marker = pointwiseMin(marker, geodesicMask);
-            if (Arrays.deepEquals(prev, marker)) break;
+            throw new IllegalArgumentException("Image et masque doivent avoir la même taille.");
         }
-        return marker;
+
+        int[][] marqueur = copy(image);
+        int[][] precedent;
+        int iter = 0;
+        int maxIter = 1000; // Sécurité anti-boucle infinie
+
+        do
+        {
+            precedent = copy(marqueur);
+            marqueur = intersection(dilateOnce(marqueur), masqueGeodesique);
+            iter++;
+            //System.out.println(STR."Iteration \{iter}: \{Arrays.deepToString(marqueur)}");
+            System.out.println("iteration :" + iter);
+        } while (!Arrays.deepEquals(precedent, marqueur) && iter < maxIter);
+
+        return marqueur;
     }
 
-    // Median filter over nxn neighborhood
     public static int[][] filtreMedian(int[][] image, int tailleMasque)
     {
         int height = image.length;
@@ -59,18 +85,66 @@ public class MorphoComplexe
         return result;
     }
 
+    public static BufferedImage filtreMedianCouleur(BufferedImage image, int tailleMasque) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int offset = tailleMasque / 2;
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        int size = tailleMasque * tailleMasque;
+
+        int[] rWindow = new int[size];
+        int[] gWindow = new int[size];
+        int[] bWindow = new int[size];
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int idx = 0;
+                for (int dy = -offset; dy <= offset; dy++) {
+                    for (int dx = -offset; dx <= offset; dx++) {
+                        int yy = clamp(y + dy, 0, height - 1);
+                        int xx = clamp(x + dx, 0, width - 1);
+                        int rgb = image.getRGB(xx, yy);
+                        rWindow[idx] = (rgb >> 16) & 0xFF;
+                        gWindow[idx] = (rgb >> 8) & 0xFF;
+                        bWindow[idx] = rgb & 0xFF;
+                        idx++;
+                    }
+                }
+                Arrays.sort(rWindow);
+                Arrays.sort(gWindow);
+                Arrays.sort(bWindow);
+                int r = rWindow[size / 2];
+                int g = gWindow[size / 2];
+                int b = bWindow[size / 2];
+                result.setRGB(x, y, (r << 16) | (g << 8) | b);
+            }
+        }
+        return result;
+    }
+
+
     // Helper: single dilation (max in 3x3)
     private static int[][] dilateOnce(int[][] img)
     {
         return MorphoElementaire.dilatation(img, 3);
     }
 
-    private static int[][] copy(int[][] src)
+    private static int[][] intersection(int[][] a, int[][] b)
     {
-        int h = src.length, w = src[0].length;
-        int[][] dst = new int[h][w];
-        for (int i = 0; i < h; i++) System.arraycopy(src[i], 0, dst[i], 0, w);
-        return dst;
+        int[][] res = new int[a.length][a[0].length];
+        for (int i = 0; i < a.length; i++)
+        {
+            for (int j = 0; j < a[0].length; j++)
+            {
+                res[i][j] = Math.min(a[i][j], b[i][j]);
+            }
+        }
+        return res;
+    }
+
+    private static int[][] copy(int[][] matrix)
+    {
+        return Arrays.stream(matrix).map(int[]::clone).toArray(int[][]::new);
     }
 
     private static int[][] pointwiseMin(int[][] a, int[][] b)

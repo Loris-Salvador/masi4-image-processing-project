@@ -14,6 +14,7 @@ import java.io.IOException;
 
 import static be.hepl.IsilImageProcessing.ImageProcessing.Step3Utils.convertToBufferedImage;
 import static be.hepl.IsilImageProcessing.ImageProcessing.Step3Utils.convertToMatrix;
+import static be.hepl.IsilImageProcessing.NonLineaire.MorphoComplexe.filtreMedianCouleur;
 
 public class Application extends JFrame {
     private JLabel imageLabel;
@@ -374,8 +375,44 @@ public class Application extends JFrame {
                     "Erreur de chargement du masque", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
-    private void showMedianDialog() {}
-    private void showImageParameters() {
+    private void showMedianDialog()
+    {
+        if (currentImage == null)
+        {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Spinner pour choisir la taille du masque (impair uniquement)
+        JSpinner tailleSpinner = new JSpinner(new SpinnerNumberModel(3, 3, 31, 2));
+        Object[] message = {"Taille du masque médian (impair):", tailleSpinner};
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Filtre médian",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (option != JOptionPane.OK_OPTION) return;
+
+        int taille = (Integer) tailleSpinner.getValue();
+
+        BufferedImage resultImage;
+
+        if (currentImage.getType() == BufferedImage.TYPE_BYTE_GRAY)
+        {
+            int[][] matrix = convertToMatrix(currentImage);
+            int[][] result = MorphoComplexe.filtreMedian(matrix, taille);
+            resultImage = convertToBufferedImage(result);
+        }
+        else
+        {
+            resultImage = filtreMedianCouleur(currentImage, taille);
+        }
+
+        currentImage = resultImage;
+        displayImage(currentImage);
+
+    }
+    private void showImageParameters()
+    {
         if (currentImage == null)
         {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);

@@ -1,11 +1,17 @@
 package be.hepl.IsilImageProcessing.NonLineaire;
 
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
 public class MorphoComplexe
 {
     public static int[][] dilatationGeodesique(int[][] image, int[][] masqueGeodesique, int nbIter) {
         int[][] marqueur = copy(image);
+
+        if (nbIter < 1)
+        {
+            throw new IllegalArgumentException("Le nombre d'itérations doit être >= 1.");
+        }
 
         for (int i = 0; i < nbIter; i++) {
             marqueur = dilateOnce(marqueur);
@@ -44,6 +50,8 @@ public class MorphoComplexe
             precedent = copy(marqueur);
             marqueur = intersection(dilateOnce(marqueur), masqueGeodesique);
             iter++;
+            //System.out.println(STR."Iteration \{iter}: \{Arrays.deepToString(marqueur)}");
+            System.out.println("iteration :" + iter);
         } while (!Arrays.deepEquals(precedent, marqueur) && iter < maxIter);
 
         return marqueur;
@@ -76,6 +84,44 @@ public class MorphoComplexe
         }
         return result;
     }
+
+    public static BufferedImage filtreMedianCouleur(BufferedImage image, int tailleMasque) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int offset = tailleMasque / 2;
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        int size = tailleMasque * tailleMasque;
+
+        int[] rWindow = new int[size];
+        int[] gWindow = new int[size];
+        int[] bWindow = new int[size];
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int idx = 0;
+                for (int dy = -offset; dy <= offset; dy++) {
+                    for (int dx = -offset; dx <= offset; dx++) {
+                        int yy = clamp(y + dy, 0, height - 1);
+                        int xx = clamp(x + dx, 0, width - 1);
+                        int rgb = image.getRGB(xx, yy);
+                        rWindow[idx] = (rgb >> 16) & 0xFF;
+                        gWindow[idx] = (rgb >> 8) & 0xFF;
+                        bWindow[idx] = rgb & 0xFF;
+                        idx++;
+                    }
+                }
+                Arrays.sort(rWindow);
+                Arrays.sort(gWindow);
+                Arrays.sort(bWindow);
+                int r = rWindow[size / 2];
+                int g = gWindow[size / 2];
+                int b = bWindow[size / 2];
+                result.setRGB(x, y, (r << 16) | (g << 8) | b);
+            }
+        }
+        return result;
+    }
+
 
     // Helper: single dilation (max in 3x3)
     private static int[][] dilateOnce(int[][] img)

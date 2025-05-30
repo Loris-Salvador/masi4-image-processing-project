@@ -27,6 +27,8 @@ public class Application extends JFrame {
         setSize(1000, 700);
         setLocationRelativeTo(null);
 
+        String projectPath = System.getProperty("user.dir");
+
         // Création des composants
         JMenuBar menuBar = createMenuBar();
         setJMenuBar(menuBar);
@@ -276,7 +278,12 @@ public class Application extends JFrame {
     }
 
     private void openImage() {
-        JFileChooser fileChooser = new JFileChooser();
+        //pour l'ouverture dans le bon fichier
+        String projectPath = System.getProperty("user.dir");
+        String imagePath = projectPath + "/src/main/java/be/hepl/assets/images";
+        JFileChooser fileChooser = new JFileChooser(imagePath);
+
+
         fileChooser.setDialogTitle("Ouvrir une image");
 
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
@@ -297,7 +304,9 @@ public class Application extends JFrame {
             return;
         }
 
-        JFileChooser fileChooser = new JFileChooser();
+        String projectPath = System.getProperty("user.dir");
+        String imagePath = projectPath + "/src/main/java/be/hepl/saves";
+        JFileChooser fileChooser = new JFileChooser(imagePath);
         fileChooser.setDialogTitle("Enregistrer l'image");
 
         if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {

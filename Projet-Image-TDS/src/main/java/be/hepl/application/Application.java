@@ -65,6 +65,7 @@ public class Application extends JFrame {
         localMenu.add(createMenuItem("Filtre moyenneur", e -> showAveragingDialog()));
         linearMenu.add(localMenu);
 
+        menuBar.add(linearMenu);
 
         // Menu Traitement Non-Linéaire
         JMenu nonLinearMenu = new JMenu("Traitement non-linéaire");

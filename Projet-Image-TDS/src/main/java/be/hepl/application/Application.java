@@ -3,6 +3,7 @@ package be.hepl.application;
 import be.hepl.IsilImageProcessing.ImageProcessing.Histogramme.Histogramme;
 import be.hepl.IsilImageProcessing.NonLineaire.MorphoComplexe;
 import be.hepl.IsilImageProcessing.NonLineaire.MorphoElementaire;
+import be.hepl.IsilImageProcessing.Seuillage.Seuillage;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -12,9 +13,13 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import static be.hepl.IsilImageProcessing.Contours.ContoursNonLineaire.*;
 import static be.hepl.IsilImageProcessing.ImageProcessing.Step3Utils.convertToBufferedImage;
 import static be.hepl.IsilImageProcessing.ImageProcessing.Step3Utils.convertToMatrix;
 import static be.hepl.IsilImageProcessing.NonLineaire.MorphoComplexe.filtreMedianCouleur;
+import static be.hepl.IsilImageProcessing.Contours.ContoursLineaire.*;
+import static be.hepl.IsilImageProcessing.Seuillage.Seuillage.*;
+
 
 public class Application extends JFrame {
     private JLabel imageLabel;
@@ -653,17 +658,226 @@ public class Application extends JFrame {
         frame.pack();
         frame.setVisible(true);
     }
-    private void showPrewittDialog() {}
-    private void showSobelDialog() {}
-    private void applyLaplacian4() {}
-    private void applyLaplacian8() {}
-    private void applyErosionGradient() {}
-    private void applyDilationGradient() {}
-    private void applyBeucherGradient() {}
-    private void applyNonLinearLaplacian() {}
-    private void showSimpleThresholdDialog() {}
-    private void showDoubleThresholdDialog() {}
-    private void applyAutoThreshold() {}
+
+    private void showPrewittDialog() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Choix de la direction via un dialogue
+        Object[] options = {"Horizontal (dir = 1)", "Vertical (dir = 2)"};
+        int choice = JOptionPane.showOptionDialog(
+                this,
+                "Choisissez la direction du gradient Prewitt :",
+                "Gradient Prewitt",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+
+        if (choice == JOptionPane.CLOSED_OPTION) return;
+
+        int dir = (choice == 0) ? 1 : 2;
+
+        // Conversion image -> matrice
+        int[][] matrix = convertToMatrix(currentImage);
+
+        // Application du filtre Prewitt
+        int[][] result = gradientPrewitt(matrix, dir);
+
+        // Conversion matrice -> BufferedImage
+        currentImage = convertToBufferedImage(result);
+
+        // Affichage de l'image résultante
+        displayImage(currentImage);
+    }
+
+    private void showSobelDialog() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Choix de la direction via un dialogue
+        Object[] options = {"Horizontal (dir = 1)", "Vertical (dir = 2)"};
+        int choice = JOptionPane.showOptionDialog(
+                this,
+                "Choisissez la direction du gradient Sobel :",
+                "Gradient Sobel",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+
+        if (choice == JOptionPane.CLOSED_OPTION) return;
+
+        int dir = (choice == 0) ? 1 : 2;
+
+        // Conversion image -> matrice
+        int[][] matrix = convertToMatrix(currentImage);
+
+        // Application du filtre Sobel
+        int[][] result = gradientSobel(matrix, dir);
+
+        // Conversion matrice -> BufferedImage
+        currentImage = convertToBufferedImage(result);
+
+        // Affichage de l'image résultante
+        displayImage(currentImage);
+    }
+
+    private void applyLaplacian4() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int[][] matrix = convertToMatrix(currentImage);
+        int[][] result = laplacien4(matrix);
+        currentImage = convertToBufferedImage(result);
+        displayImage(currentImage);
+    }
+
+    private void applyLaplacian8() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int[][] matrix = convertToMatrix(currentImage);
+        int[][] result = laplacien8(matrix);
+        currentImage = convertToBufferedImage(result);
+        displayImage(currentImage);
+    }
+
+    private void applyErosionGradient() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int[][] matrix = convertToMatrix(currentImage);
+        int[][] result = gradientErosion(matrix);
+        currentImage = convertToBufferedImage(result);
+        displayImage(currentImage);
+    }
+
+    private void applyDilationGradient() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int[][] matrix = convertToMatrix(currentImage);
+        int[][] result = gradientDilatation(matrix);
+        currentImage = convertToBufferedImage(result);
+        displayImage(currentImage);
+    }
+
+    private void applyBeucherGradient() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int[][] matrix = convertToMatrix(currentImage);
+        int[][] result = gradientBeucher(matrix);
+        currentImage = convertToBufferedImage(result);
+        displayImage(currentImage);
+    }
+
+    private void applyNonLinearLaplacian() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int[][] matrix = convertToMatrix(currentImage);
+        int[][] result = laplacienNonLineaire(matrix);
+        currentImage = convertToBufferedImage(result);
+        displayImage(currentImage);
+    }
+
+    private void showSimpleThresholdDialog() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Création d'un spinner pour entrer la valeur du seuil
+        JSpinner seuilSpinner = new JSpinner(new SpinnerNumberModel(128, 0, 255, 1));
+
+        Object[] message = {
+                "Valeur du seuil (0-255):", seuilSpinner
+        };
+
+        int option = JOptionPane.showConfirmDialog(
+                this,
+                message,
+                "Seuillage simple",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (option == JOptionPane.OK_OPTION) {
+            int seuil = (Integer) seuilSpinner.getValue();
+            int[][] matrix = convertToMatrix(currentImage);
+            int[][] result = seuillageSimple(matrix, seuil);
+            currentImage = convertToBufferedImage(result);
+            displayImage(currentImage);
+        }
+    }
+
+    private void showDoubleThresholdDialog() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        JSpinner seuil1Spinner = new JSpinner(new SpinnerNumberModel(85, 0, 254, 1));
+        JSpinner seuil2Spinner = new JSpinner(new SpinnerNumberModel(170, 1, 255, 1));
+
+        Object[] message = {
+                "Seuil bas :", seuil1Spinner,
+                "Seuil haut :", seuil2Spinner
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Seuillage double",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (option == JOptionPane.OK_OPTION) {
+            int seuil1 = (Integer) seuil1Spinner.getValue();
+            int seuil2 = (Integer) seuil2Spinner.getValue();
+
+            if (seuil1 >= seuil2) {
+                JOptionPane.showMessageDialog(this, "Seuil bas doit être < seuil haut", "Erreur", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            int[][] matrix = convertToMatrix(currentImage);
+            int[][] result = Seuillage.seuillageDouble(matrix, seuil1, seuil2);
+            currentImage = convertToBufferedImage(result);
+            displayImage(currentImage);
+        }
+    }
+
+    private void applyAutoThreshold() {
+        if (currentImage == null) {
+            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int[][] matrix = convertToMatrix(currentImage);
+        int[][] result = Seuillage.seuillageAutomatique(matrix);
+        currentImage = convertToBufferedImage(result);
+        displayImage(currentImage);
+    }
+
     private void runApplication(String appNumber) {}
 
     public static void main(String[] args) {

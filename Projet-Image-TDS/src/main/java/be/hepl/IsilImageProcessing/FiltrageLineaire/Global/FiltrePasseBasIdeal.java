@@ -37,7 +37,7 @@ public class FiltrePasseBasIdeal {
                 } else {
                     resultat[y][x] = image[y][x]; // Si aucun pixel n'est trouvé, conserver la valeur d'origine
                 }
-                
+
             }
         }
 

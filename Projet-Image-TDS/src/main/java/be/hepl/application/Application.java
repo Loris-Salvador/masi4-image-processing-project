@@ -1,6 +1,7 @@
 package be.hepl.application;
 
 import be.hepl.IsilImageProcessing.FiltrageLineaire.Global.FiltrePasseBasIdeal;
+import be.hepl.IsilImageProcessing.FiltrageLineaire.Global.FiltrePasseHautIdeal;
 import be.hepl.IsilImageProcessing.ImageProcessing.Histogramme.Histogramme;
 import be.hepl.IsilImageProcessing.NonLineaire.MorphoComplexe;
 import be.hepl.IsilImageProcessing.NonLineaire.MorphoElementaire;
@@ -186,7 +187,7 @@ public class Application extends JFrame {
 
                     break;
                 case "Passe-haut ideal":
-                    // currentImage = FiltrageLineaireGlobal.filtrePasseHautIdeal(currentImage, frequency);
+                    result = FiltrePasseHautIdeal.filtrePasseHaut(mat, frequency);
                     System.out.println("Filtre Passe-haut idéal avec fréquence: " + frequency);
                     break;
 

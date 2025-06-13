@@ -11,6 +11,7 @@ public class FiltrePasseBasIdeal {
         int[][] resultat = new int[hauteur][largeur];
 
         int decalage = tailleMasque / 2;
+        System.out.println(decalage);
 
         for (int y = 0; y < hauteur; y++) {
             for (int x = 0; x < largeur; x++) {
@@ -36,6 +37,7 @@ public class FiltrePasseBasIdeal {
                 } else {
                     resultat[y][x] = image[y][x]; // Si aucun pixel n'est trouvé, conserver la valeur d'origine
                 }
+                
             }
         }
 

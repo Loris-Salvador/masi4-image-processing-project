@@ -1,5 +1,6 @@
 package be.hepl.application;
 
+import be.hepl.IsilImageProcessing.FiltrageLineaire.Global.FiltrePasseBasIdeal;
 import be.hepl.IsilImageProcessing.ImageProcessing.Histogramme.Histogramme;
 import be.hepl.IsilImageProcessing.NonLineaire.MorphoComplexe;
 import be.hepl.IsilImageProcessing.NonLineaire.MorphoElementaire;
@@ -58,8 +59,8 @@ public class Application extends JFrame {
 
         // Sous-menu Global
         JMenu globalMenu = new JMenu("Global");
-        globalMenu.add(createMenuItem("Passe-bas idéal", e -> showFrequencyDialog("Passe-bas idéal")));
-        globalMenu.add(createMenuItem("Passe-haut idéal", e -> showFrequencyDialog("Passe-haut idéal")));
+        globalMenu.add(createMenuItem("Passe-bas idéal", e -> showFrequencyDialog("Passe-bas ideal")));
+        globalMenu.add(createMenuItem("Passe-haut idéal", e -> showFrequencyDialog("Passe-haut ideal")));
         globalMenu.add(createMenuItem("Passe-bas Butterworth", e -> showButterworthDialog("Passe-bas Butterworth")));
         globalMenu.add(createMenuItem("Passe-haut Butterworth", e -> showButterworthDialog("Passe-haut Butterworth")));
         linearMenu.add(globalMenu);
@@ -156,6 +157,9 @@ public class Application extends JFrame {
         return item;
     }
 
+    /* --------------------------------------------------------------------------------------------------------
+       --------------------------------------------------------------------------------------------------------
+       --------------------------------------------------------------------------------------------------------*/
     // Méthodes pour afficher les différentes boîtes de dialogue
     private void showFrequencyDialog(String filterType)
     {
@@ -165,13 +169,31 @@ public class Application extends JFrame {
                 "Fréquence de coupure:", freqSpinner
         };
 
+        int[][] mat = convertToMatrix(currentImage);
+        int[][] result = mat;
+
+
+
         int option = JOptionPane.showConfirmDialog(this, message, filterType,
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (option == JOptionPane.OK_OPTION) {
             int frequency = (Integer)freqSpinner.getValue();
+            switch (filterType){
+                case "Passe-bas ideal":
+                    result = FiltrePasseBasIdeal.filtrePasseBas(mat, frequency);
+                    System.out.println("Filtre Passe-bas idéal avec fréquence: " + frequency);
+
+                    break;
+                case "Passe-haut ideal":
+                    // currentImage = FiltrageLineaireGlobal.filtrePasseHautIdeal(currentImage, frequency);
+                    System.out.println("Filtre Passe-haut idéal avec fréquence: " + frequency);
+                    break;
+
+            }
             // Appeler la méthode de filtrage appropriée
             // currentImage = FiltrageLineaireGlobal.filtrePasseBasIdeal(currentImage, frequency);
+            currentImage = convertToBufferedImage(result);
             displayImage(currentImage);
         }
     }
@@ -191,12 +213,25 @@ public class Application extends JFrame {
         if (option == JOptionPane.OK_OPTION) {
             int frequency = (Integer)freqSpinner.getValue();
             int order = (Integer)orderSpinner.getValue();
+            switch (filterType){
+                case "Passe-bas Butterworth":
+                    // currentImage = FiltrageLineaireGlobal.filtrePasseBasButterworth(currentImage, frequency, 1);
+                    System.out.println("Filtre Passe-bas Butterworth avec fréquence: " + frequency);
+                    break;
+                case "Passe-haut Butterworth":
+                    // currentImage = FiltrageLineaireGlobal.filtrePasseHautButterworth(currentImage, frequency, 1);
+                    System.out.println("Filtre Passe-haut Butterworth avec fréquence: " + frequency);
+                    break;
+            }
             // Appeler la méthode de filtrage appropriée
             // currentImage = FiltrageLineaireGlobal.filtrePasseBasButterworth(currentImage, frequency, order);
             displayImage(currentImage);
         }
     }
 
+    /* --------------------------------------------------------------------------------------------------------
+       --------------------------------------------------------------------------------------------------------
+       --------------------------------------------------------------------------------------------------------*/
     private void showConvolutionDialog() {
         JTextArea maskArea = new JTextArea(5, 10);
         maskArea.setText("1 1 1\n1 1 1\n1 1 1");

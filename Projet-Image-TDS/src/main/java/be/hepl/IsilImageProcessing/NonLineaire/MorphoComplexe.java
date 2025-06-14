@@ -43,7 +43,8 @@ public class MorphoComplexe
         int[][] marqueur = copy(image);
         int[][] precedent;
         int iter = 0;
-        int maxIter = 1000; // Sécurité anti-boucle infinie
+        // Sécurité anti-boucle infinie
+        int maxIter = 1000;
 
         do
         {
@@ -96,11 +97,15 @@ public class MorphoComplexe
         int[] gWindow = new int[size];
         int[] bWindow = new int[size];
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
                 int idx = 0;
-                for (int dy = -offset; dy <= offset; dy++) {
-                    for (int dx = -offset; dx <= offset; dx++) {
+                for (int dy = -offset; dy <= offset; dy++)
+                {
+                    for (int dx = -offset; dx <= offset; dx++)
+                    {
                         int yy = clamp(y + dy, 0, height - 1);
                         int xx = clamp(x + dx, 0, width - 1);
                         int rgb = image.getRGB(xx, yy);

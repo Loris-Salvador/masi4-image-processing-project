@@ -9,14 +9,19 @@ public class MorphoElementaire
         int width = image[0].length;
         int offset = tailleMasque / 2;
         int[][] result = new int[height][width];
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
                 int min = Integer.MAX_VALUE;
-                for (int dy = -offset; dy <= offset; dy++) {
-                    for (int dx = -offset; dx <= offset; dx++) {
+                for (int dy = -offset; dy <= offset; dy++)
+                {
+                    for (int dx = -offset; dx <= offset; dx++)
+                    {
                         int yy = y + dy;
                         int xx = x + dx;
-                        if (yy >= 0 && yy < height && xx >= 0 && xx < width) {
+                        if (yy >= 0 && yy < height && xx >= 0 && xx < width)
+                        {
                             min = Math.min(min, image[yy][xx]);
                         }
                     }
@@ -34,14 +39,19 @@ public class MorphoElementaire
         int width = image[0].length;
         int offset = tailleMasque / 2;
         int[][] result = new int[height][width];
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
                 int max = Integer.MIN_VALUE;
-                for (int dy = -offset; dy <= offset; dy++) {
-                    for (int dx = -offset; dx <= offset; dx++) {
+                for (int dy = -offset; dy <= offset; dy++)
+                {
+                    for (int dx = -offset; dx <= offset; dx++)
+                    {
                         int yy = y + dy;
                         int xx = x + dx;
-                        if (yy >= 0 && yy < height && xx >= 0 && xx < width) {
+                        if (yy >= 0 && yy < height && xx >= 0 && xx < width)
+                        {
                             max = Math.max(max, image[yy][xx]);
                         }
                     }

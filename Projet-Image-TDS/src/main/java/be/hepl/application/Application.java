@@ -485,7 +485,7 @@ public class Application extends JFrame {
 
         int[][] imageMatrix = convertToMatrix(currentImage);
 
-        // Afficher l'histogramme avant
+
         int[] histAvant = Histogramme.Histogramme256(imageMatrix);
         afficherHistogramme(histAvant, "Histogramme original");
 

@@ -1,11 +1,11 @@
-package be.hepl.IsilImageProcessing.DFT;
+package be.hepl.ImageProcessing.FiltrageLineaire.DFT;
 
-import be.hepl.IsilImageProcessing.ImageProcessing.Complexe.Complex;
+import be.hepl.ImageProcessing.FiltrageLineaire.Complexe.Complex;
 
-import static be.hepl.IsilImageProcessing.DFT.TF1DCalculator.TF1D;
+import static be.hepl.ImageProcessing.FiltrageLineaire.DFT.TF1DCalculator.TF1D;
 
 
-public class TF2DCalulator {
+public class TF2DCalculator {
     public static Complex[][] TF2D(double[][] image) {
         int hauteur = image.length;
         int largeur = image[0].length; //ici

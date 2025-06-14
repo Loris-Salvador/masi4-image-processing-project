@@ -1,8 +1,4 @@
-package be.hepl.IsilImageProcessing.ImageProcessing.Histogramme;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
+package be.hepl.ImageProcessing.Histogramme;
 
 public class Histogramme {
 

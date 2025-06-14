@@ -1,4 +1,4 @@
-package be.hepl.IsilImageProcessing.NonLineaire;
+package be.hepl.ImageProcessing.NonLineaire;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;

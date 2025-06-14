@@ -1,6 +1,6 @@
-package be.hepl.IsilImageProcessing.Contours;
+package be.hepl.ImageProcessing.Contours;
 
-import be.hepl.IsilImageProcessing.NonLineaire.MorphoElementaire;
+import be.hepl.ImageProcessing.NonLineaire.MorphoElementaire;
 
 public class ContoursNonLineaire {
     public static int[][] gradientErosion(int[][] image) {

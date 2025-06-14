@@ -1,8 +1,5 @@
 package be.hepl;
 
-import be.hepl.IsilImageProcessing.Contours.ContoursLineaire;
-import be.hepl.application.Application;
-
 import javax.swing.*;
 
 public class Main {
@@ -10,7 +7,7 @@ public class Main {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new Application().setVisible(true);
+                new IsilImageProcessingApplication().setVisible(true);
             }
         });
     }

@@ -1,9 +1,9 @@
-package be.hepl.IsilImageProcessing.ImageProcessing;
+package be.hepl.ImageProcessing.Histogramme;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class Step3Utils
+public class HistogrammeUtils
 {
 
     public static int[][] convertToMatrix(BufferedImage image) {

@@ -1,4 +1,4 @@
-package be.hepl.IsilImageProcessing.NonLineaire;
+package be.hepl.ImageProcessing.NonLineaire;
 
 public class MorphoElementaire
 {

@@ -1,35 +1,34 @@
-package be.hepl.application;
+package be.hepl;
 
-import be.hepl.IsilImageProcessing.FiltrageLineaire.Global.FiltrePasseBasIdeal;
-import be.hepl.IsilImageProcessing.FiltrageLineaire.Global.FiltrePasseHautIdeal;
-import be.hepl.IsilImageProcessing.FiltrageLineaire.Local.FiltreMoyenneur;
-import be.hepl.IsilImageProcessing.FiltrageLineaire.Local.MasqueConvolution;
-import be.hepl.IsilImageProcessing.ImageProcessing.Histogramme.Histogramme;
-import be.hepl.IsilImageProcessing.NonLineaire.MorphoComplexe;
-import be.hepl.IsilImageProcessing.NonLineaire.MorphoElementaire;
-import be.hepl.IsilImageProcessing.Seuillage.Seuillage;
+import be.hepl.ImageProcessing.FiltrageLineaire.Global.FiltrePasseBasIdeal;
+import be.hepl.ImageProcessing.FiltrageLineaire.Global.FiltrePasseHautIdeal;
+import be.hepl.ImageProcessing.FiltrageLineaire.Local.FiltreMoyenneur;
+import be.hepl.ImageProcessing.FiltrageLineaire.Local.MasqueConvolution;
+import be.hepl.ImageProcessing.Histogramme.Histogramme;
+import be.hepl.ImageProcessing.NonLineaire.MorphoComplexe;
+import be.hepl.ImageProcessing.NonLineaire.MorphoElementaire;
+import be.hepl.ImageProcessing.Seuillage.Seuillage;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import static be.hepl.IsilImageProcessing.Contours.ContoursNonLineaire.*;
-import static be.hepl.IsilImageProcessing.ImageProcessing.Step3Utils.convertToBufferedImage;
-import static be.hepl.IsilImageProcessing.ImageProcessing.Step3Utils.convertToMatrix;
-import static be.hepl.IsilImageProcessing.NonLineaire.MorphoComplexe.filtreMedianCouleur;
-import static be.hepl.IsilImageProcessing.Contours.ContoursLineaire.*;
-import static be.hepl.IsilImageProcessing.Seuillage.Seuillage.*;
+import static be.hepl.ImageProcessing.Contours.ContoursNonLineaire.*;
+import static be.hepl.ImageProcessing.Histogramme.HistogrammeUtils.convertToBufferedImage;
+import static be.hepl.ImageProcessing.Histogramme.HistogrammeUtils.convertToMatrix;
+import static be.hepl.ImageProcessing.NonLineaire.MorphoComplexe.filtreMedianCouleur;
+import static be.hepl.ImageProcessing.Contours.ContoursLineaire.*;
+import static be.hepl.ImageProcessing.Seuillage.Seuillage.*;
 
 
-public class Application extends JFrame {
+public class IsilImageProcessingApplication extends JFrame {
     private JLabel imageLabel;
     private BufferedImage currentImage;
 
-    public Application() {
+    public IsilImageProcessingApplication() {
         // Configuration de la fenêtre principale
         setTitle("IsilImageProcessing");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -335,8 +334,8 @@ public class Application extends JFrame {
     private void openImage() {
         //pour l'ouverture dans le bon fichier
         String projectPath = System.getProperty("user.dir");
-        String imagePath = projectPath + "/src/main/java/be/hepl/assets/images";
-        JFileChooser fileChooser = new JFileChooser(imagePath);
+        //String imagePath = projectPath + "/src/main/java/be/hepl/assets/images";
+        JFileChooser fileChooser = new JFileChooser(projectPath + "/assets/images");
 
 
         fileChooser.setDialogTitle("Ouvrir une image");
@@ -927,11 +926,4 @@ public class Application extends JFrame {
     }
 
     private void runApplication(String appNumber) {}
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            Application app = new Application();
-            app.setVisible(true);
-        });
-    }
 }

@@ -1,4 +1,4 @@
-package be.hepl.ImageProcessing.Histogramme;
+package be.hepl.imageprocessing.histogramme;
 
 public class Histogramme {
 

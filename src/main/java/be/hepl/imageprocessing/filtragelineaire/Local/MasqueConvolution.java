@@ -1,4 +1,4 @@
-package be.hepl.ImageProcessing.FiltrageLineaire.Local;
+package be.hepl.imageprocessing.filtragelineaire.Local;
 
 public class MasqueConvolution {
 

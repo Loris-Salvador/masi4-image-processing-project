@@ -1,4 +1,4 @@
-package be.hepl.ImageProcessing.FiltrageLineaire.Global;
+package be.hepl.imageprocessing.filtragelineaire.Global;
 
 public class FiltrePasseHautIdeal {
 

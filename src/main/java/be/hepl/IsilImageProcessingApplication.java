@@ -1,13 +1,13 @@
 package be.hepl;
 
-import be.hepl.ImageProcessing.FiltrageLineaire.Global.FiltrePasseBasIdeal;
-import be.hepl.ImageProcessing.FiltrageLineaire.Global.FiltrePasseHautIdeal;
-import be.hepl.ImageProcessing.FiltrageLineaire.Local.FiltreMoyenneur;
-import be.hepl.ImageProcessing.FiltrageLineaire.Local.MasqueConvolution;
-import be.hepl.ImageProcessing.Histogramme.Histogramme;
-import be.hepl.ImageProcessing.NonLineaire.MorphoComplexe;
-import be.hepl.ImageProcessing.NonLineaire.MorphoElementaire;
-import be.hepl.ImageProcessing.Seuillage.Seuillage;
+import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseBasIdeal;
+import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseHautIdeal;
+import be.hepl.imageprocessing.filtragelineaire.Local.FiltreMoyenneur;
+import be.hepl.imageprocessing.filtragelineaire.Local.MasqueConvolution;
+import be.hepl.imageprocessing.histogramme.Histogramme;
+import be.hepl.imageprocessing.nonlineaire.MorphoComplexe;
+import be.hepl.imageprocessing.nonlineaire.MorphoElementaire;
+import be.hepl.imageprocessing.seuillage.Seuillage;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,12 +16,12 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import static be.hepl.ImageProcessing.Contours.ContoursNonLineaire.*;
-import static be.hepl.ImageProcessing.Histogramme.HistogrammeUtils.convertToBufferedImage;
-import static be.hepl.ImageProcessing.Histogramme.HistogrammeUtils.convertToMatrix;
-import static be.hepl.ImageProcessing.NonLineaire.MorphoComplexe.filtreMedianCouleur;
-import static be.hepl.ImageProcessing.Contours.ContoursLineaire.*;
-import static be.hepl.ImageProcessing.Seuillage.Seuillage.*;
+import static be.hepl.imageprocessing.contours.ContoursNonLineaire.*;
+import static be.hepl.imageprocessing.histogramme.HistogrammeUtils.convertToBufferedImage;
+import static be.hepl.imageprocessing.histogramme.HistogrammeUtils.convertToMatrix;
+import static be.hepl.imageprocessing.nonlineaire.MorphoComplexe.filtreMedianCouleur;
+import static be.hepl.imageprocessing.contours.ContoursLineaire.*;
+import static be.hepl.imageprocessing.seuillage.Seuillage.*;
 
 
 public class IsilImageProcessingApplication extends JFrame {

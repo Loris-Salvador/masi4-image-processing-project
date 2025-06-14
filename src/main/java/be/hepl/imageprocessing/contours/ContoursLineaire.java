@@ -1,4 +1,4 @@
-package be.hepl.ImageProcessing.Contours;
+package be.hepl.imageprocessing.contours;
 
 public class ContoursLineaire {
     public static int[][] gradientPrewitt(int[][] image, int dir) {

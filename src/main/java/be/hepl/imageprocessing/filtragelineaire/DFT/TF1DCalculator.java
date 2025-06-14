@@ -1,6 +1,6 @@
-package be.hepl.ImageProcessing.FiltrageLineaire.DFT;
+package be.hepl.imageprocessing.filtragelineaire.DFT;
 
-import be.hepl.ImageProcessing.FiltrageLineaire.Complexe.Complex;
+import be.hepl.imageprocessing.filtragelineaire.Complexe.Complex;
 
 
 public class TF1DCalculator{

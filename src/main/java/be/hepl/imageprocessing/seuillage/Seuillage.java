@@ -1,4 +1,4 @@
-package be.hepl.ImageProcessing.Seuillage;
+package be.hepl.imageprocessing.seuillage;
 
 public class Seuillage {
 

@@ -2,6 +2,7 @@ package be.hepl.application;
 
 import be.hepl.IsilImageProcessing.FiltrageLineaire.Global.FiltrePasseBasIdeal;
 import be.hepl.IsilImageProcessing.FiltrageLineaire.Global.FiltrePasseHautIdeal;
+import be.hepl.IsilImageProcessing.FiltrageLineaire.Local.FiltreMoyenneur;
 import be.hepl.IsilImageProcessing.FiltrageLineaire.Local.MasqueConvolution;
 import be.hepl.IsilImageProcessing.ImageProcessing.Histogramme.Histogramme;
 import be.hepl.IsilImageProcessing.NonLineaire.MorphoComplexe;
@@ -262,7 +263,6 @@ public class Application extends JFrame {
                     }
                 }
 
-                // Convertir en tableau 1D si nécessaire
                 result = MasqueConvolution.filtreMasqueConvolution(mat, mask);
                 currentImage = convertToBufferedImage(result);
                 displayImage(currentImage);
@@ -275,6 +275,9 @@ public class Application extends JFrame {
     private void showAveragingDialog() {
         JSpinner sizeSpinner = new JSpinner(new SpinnerNumberModel(3, 3, 15, 2));
 
+        int[][] mat = convertToMatrix(currentImage);
+        int[][] result = mat;
+
         Object[] message = {
                 "Taille du masque (n x n, n impair):", sizeSpinner
         };
@@ -284,6 +287,11 @@ public class Application extends JFrame {
 
         if (option == JOptionPane.OK_OPTION) {
             int size = (Integer)sizeSpinner.getValue();
+
+
+            result = FiltreMoyenneur.filtreMoyenneur(mat, size);
+            currentImage = convertToBufferedImage(result);
+            displayImage(currentImage);
             // currentImage = FiltrageLineaireLocal.filtreMoyenneur(currentImage, size);
             displayImage(currentImage);
         }

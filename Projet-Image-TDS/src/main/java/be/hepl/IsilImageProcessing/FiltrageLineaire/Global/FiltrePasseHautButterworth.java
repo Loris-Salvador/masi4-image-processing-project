@@ -2,23 +2,33 @@ package be.hepl.IsilImageProcessing.FiltrageLineaire.Global;
 
 public class FiltrePasseHautButterworth {
 
-    public static double[][] butterworthHighPassFilter(double[][] imageFFT, double D0, int n) {
-        int hauteur = imageFFT.length;
-        int largeur = imageFFT[0].length;
-        double[][] resultat = new double[hauteur][largeur];
+    public static int[][] butterworthHighPassFilter(int[][] img, int D0, int n) {
+        int h = img.length, w = img[0].length;
+        int[][] res = new int[h][w];
+        int scale = 10000, D0s = D0 * scale; // facteur d'échelle pour simuler les réels
 
-        for (int u = 0; u < hauteur; u++) {
-            for (int v = 0; v < largeur; v++) {
-                double du = u - hauteur / 2.0;
-                double dv = v - largeur / 2.0;
-                double D = Math.sqrt(du * du + dv * dv);
+        for (int u = 0; u < h; u++) {
+            int du = u - h / 2; // distance verticale au centre
+            for (int v = 0; v < w; v++) {
+                int dv = v - w / 2;
+                int D2 = du * du + dv * dv; // distance au carré
+                if (D2 == 0) D2 = 1; // éviter division par zéro
 
-                // Butterworth passe-haut
-                double H = 1.0 / (1.0 + Math.pow(D0 / (D + 0.0001), 2 * n)); // +0.0001 évite division par 0
-                resultat[u][v] = imageFFT[u][v] * H;
+                // ratio = (D0 / D)^2 à l’échelle
+                long r = ((long) D0s * D0s) / D2;
+
+                // ratio^(2n)
+                long p = r;
+                for (int i = 1; i < 2 * n; i++) p = (p * r) / scale;
+
+                // H = 1 / (1 + ratio^(2n)), à l’échelle
+                long H = (scale * scale) / (scale + p);
+
+                // multiplication du pixel par H
+                res[u][v] = (int)((long) img[u][v] * H / scale);
             }
         }
 
-        return resultat;
+        return res;
     }
 }

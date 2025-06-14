@@ -13,8 +13,6 @@ public class Main {
                 new Application().setVisible(true);
             }
         });
-
-        //test unitaire
     }
 }
 

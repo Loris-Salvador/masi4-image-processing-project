@@ -87,8 +87,8 @@ public class Application extends JFrame {
         elementaryMenu.add(createMenuItem("Fermeture", e -> showMorphoDialog("Fermeture")));
         nonLinearMenu.add(elementaryMenu);
 
-        // Sous-menu Complexe
-        JMenu complexMenu = new JMenu("Complexe");
+        // Sous-menu Complex
+        JMenu complexMenu = new JMenu("Complex");
         complexMenu.add(createMenuItem("Dilatation géodésique", e -> showGeodesicDialog("Dilatation")));
         complexMenu.add(createMenuItem("Reconstruction géodésique", e -> showGeodesicDialog("Reconstruction")));
         complexMenu.add(createMenuItem("Filtre médian", e -> showMedianDialog()));
@@ -379,7 +379,6 @@ public class Application extends JFrame {
         if (image != null) {
             ImageIcon icon = new ImageIcon(image);
             imageLabel.setIcon(icon);
-            pack();
         }
     }
 

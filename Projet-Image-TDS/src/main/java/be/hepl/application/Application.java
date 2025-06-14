@@ -2,6 +2,7 @@ package be.hepl.application;
 
 import be.hepl.IsilImageProcessing.FiltrageLineaire.Global.FiltrePasseBasIdeal;
 import be.hepl.IsilImageProcessing.FiltrageLineaire.Global.FiltrePasseHautIdeal;
+import be.hepl.IsilImageProcessing.FiltrageLineaire.Local.MasqueConvolution;
 import be.hepl.IsilImageProcessing.ImageProcessing.Histogramme.Histogramme;
 import be.hepl.IsilImageProcessing.NonLineaire.MorphoComplexe;
 import be.hepl.IsilImageProcessing.NonLineaire.MorphoElementaire;
@@ -237,6 +238,9 @@ public class Application extends JFrame {
         JTextArea maskArea = new JTextArea(5, 10);
         maskArea.setText("1 1 1\n1 1 1\n1 1 1");
 
+        int[][] mat = convertToMatrix(currentImage);
+        int[][] result = mat;
+
         Object[] message = {
                 "Entrez le masque de convolution (une ligne par rangée, valeurs séparées par des espaces):",
                 new JScrollPane(maskArea)
@@ -259,7 +263,8 @@ public class Application extends JFrame {
                 }
 
                 // Convertir en tableau 1D si nécessaire
-                // currentImage = FiltrageLineaireLocal.filtreMasqueConvolution(currentImage, mask);
+                result = MasqueConvolution.filtreMasqueConvolution(mat, mask);
+                currentImage = convertToBufferedImage(result);
                 displayImage(currentImage);
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, "Format de masque invalide", "Erreur", JOptionPane.ERROR_MESSAGE);

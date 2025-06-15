@@ -940,7 +940,12 @@ public class IsilImageProcessingApplication extends JFrame {
     private void runApplication(String appNumber) {
         System.out.println(appNumber);
 
-        if (appNumber.equals("Application 2")){
+
+        if(appNumber.equals("Application 1"))
+        {
+            bruit();
+        }
+        else if (appNumber.equals("Application 2")){
             applicationRehaussement();
         }
         else if(appNumber.equals("Application 3")) {
@@ -960,6 +965,31 @@ public class IsilImageProcessingApplication extends JFrame {
 
 
     }
+
+    private void bruit() {
+
+
+        try {
+
+            Point location = this.getLocationOnScreen();
+
+            String projectPath = System.getProperty("user.dir");
+
+            BufferedImage image = ImageIO.read(new File(projectPath + "/assets/ImageEtape5/imageBruitee1.png"));
+
+            int[][] matrix = ImageConverter.convertToMatrix(image);
+
+            int[][] test = MorphoElementaire.ouverture(matrix, 5);
+
+
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(test), "Image originale", location.x, location.y);
+
+        }
+        catch (IOException e) {
+
+        }
+    }
+
 
     private void applicationRehaussement() {
 

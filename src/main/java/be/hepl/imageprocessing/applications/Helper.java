@@ -96,4 +96,39 @@ public class Helper {
         return luminance;
     }
 
+    public static int[][] appliquerMasque(int[][] masqueBinaire, int[][] imageGris) {
+        int height = imageGris.length;
+        int width = imageGris[0].length;
+        int[][] resultat = new int[height][width];
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (masqueBinaire[y][x] != 0) {
+                    resultat[y][x] = imageGris[y][x]; // garde la valeur réelle
+                } else {
+                    resultat[y][x] = 0; // fond noir
+                }
+            }
+        }
+        return resultat;
+    }
+
+    public static int[][] soustractionBinaire(int[][] a, int[][] b) {
+        int h = a.length;
+        int w = a[0].length;
+        int[][] res = new int[h][w];
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                if (a[y][x] == 255 && b[y][x] == 0) {
+                    res[y][x] = 255;
+                } else {
+                    res[y][x] = 0;
+                }
+            }
+        }
+        return res;
+    }
+
+
+
 }

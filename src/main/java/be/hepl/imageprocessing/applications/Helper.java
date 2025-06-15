@@ -159,6 +159,33 @@ public class Helper {
         return res;
     }
 
+    public static BufferedImage appliquerMasqueCouleur(BufferedImage image, int[][] masqueBinaire) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        // Vérification corrigée : largeur == masqueBinaire.length, hauteur == masqueBinaire[0].length
+        if (width != masqueBinaire.length || height != masqueBinaire[0].length) {
+            throw new IllegalArgumentException("L'image et le masque doivent avoir la même taille");
+        }
+
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        // Boucle inversée pour respecter [x][y]
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (masqueBinaire[x][y] == 255) {
+                    int rgb = image.getRGB(x, y);
+                    result.setRGB(x, y, rgb);
+                } else {
+                    result.setRGB(x, y, 0x00000000); // transparent
+                }
+            }
+        }
+
+        return result;
+    }
+
+
 
 
 }

@@ -947,6 +947,8 @@ public class IsilImageProcessingApplication extends JFrame {
             balanes();
         } else if (appNumber.equals("Application 5")) {
             tools();
+        } else if (appNumber.equals("Application 6")) {
+            vaisseau();
         }
 
 
@@ -1115,6 +1117,92 @@ public class IsilImageProcessingApplication extends JFrame {
 
         }
     }
+
+    public void vaisseau() {
+        String projectPath = System.getProperty("user.dir");
+
+        try {
+            BufferedImage image = ImageIO.read(new File(projectPath + "/assets/ImageEtape5/vaisseaux.jpg"));
+
+            Point location = this.getLocationOnScreen();
+
+            int[][] matrix = ImageConverter.convertToMatrix(image);
+
+            int[][] seuillageAuto = Seuillage.seuillageAutomatique(matrix);
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(seuillageAuto), "test", location.x, location.y);
+
+            int[][] petitVaisseau = MorphoElementaire.erosion(seuillageAuto, 15);
+            int[][] reconstructionVaisseaux = MorphoComplexe.reconstructionGeodesique(petitVaisseau, seuillageAuto);
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(reconstructionVaisseaux), "test", location.x, location.y);
+
+            int[][] GrosVaisseau = MorphoElementaire.erosion(seuillageAuto, 25);
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(GrosVaisseau), "test", location.x, location.y);
+            int[][] reconstructionGrosVaisseau = MorphoComplexe.reconstructionGeodesique(GrosVaisseau, seuillageAuto);
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(reconstructionGrosVaisseau), "test", location.x, location.y);
+
+            int[][] petitVaisseauEntier = Helper.soustractionBinaire(reconstructionVaisseaux, reconstructionGrosVaisseau);
+
+            int tailleMasque = 9;
+            int[][] petitVaisseauNettoye = MorphoElementaire.fermeture(petitVaisseauEntier, tailleMasque);
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(petitVaisseauNettoye), "Petit vaisseau nettoyé", location.x, location.y);
+
+            BufferedImage petitRGBNettoye = Helper.appliquerMasqueCouleur(image, petitVaisseauNettoye);
+            afficherImageDialog(this, petitRGBNettoye, "Petit vaisseau coloré nettoyé", location.x, location.y);
+
+            BufferedImage planete = ImageIO.read(new File(projectPath + "/assets/ImageEtape5/planete.jpg"));
+
+            for (int y = 0; y < planete.getHeight(); y++) {
+                for (int x = 0; x < planete.getWidth(); x++) {
+                    int argb = petitRGBNettoye.getRGB(x, y);
+                    if ((argb >> 24) != 0x00) { // pixel non transparent
+                        planete.setRGB(x, y, argb);
+                    }
+                }
+            }
+            ImageIO.write(planete, "png", new File(projectPath + "/assets/ImageEtape5/synthese.png"));
+
+
+
+            int[][] dilatePetitVaisseau = MorphoElementaire.dilatation(petitVaisseauNettoye, 3);
+
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(dilatePetitVaisseau), "Petit vaisseau coloré nettoyé", location.x, location.y);
+
+            int[][] contourPetitVaisseau = Helper.soustractionBinaire(dilatePetitVaisseau, petitVaisseauNettoye);
+
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(contourPetitVaisseau), "Petit vaisseau coloré nettoyé", location.x, location.y);
+
+
+            BufferedImage planeteAvecContour = ImageIO.read(new File(projectPath + "/assets/ImageEtape5/planete.jpg"));
+
+            for (int y = 0; y < planeteAvecContour.getHeight(); y++) {
+                for (int x = 0; x < planeteAvecContour.getWidth(); x++) {
+                    int argb = petitRGBNettoye.getRGB(x, y);
+                    if ((argb >> 24) != 0x00) { // pixel non transparent
+                        planeteAvecContour.setRGB(x, y, argb);
+                    }
+                }
+            }
+
+            int hauteurContour = contourPetitVaisseau.length;
+            int largeurContour = contourPetitVaisseau[0].length;
+
+            for (int y = 0; y < planeteAvecContour.getHeight(); y++) {
+                for (int x = 0; x < planeteAvecContour.getWidth(); x++) {
+                    if (y < largeurContour && x < hauteurContour) {
+                        if (contourPetitVaisseau[x][y] == 255) {
+                            planeteAvecContour.setRGB(x, y, 0xFFFF0000);
+                        }
+                    }
+                }
+            }
+
+            ImageIO.write(planeteAvecContour, "png", new File(projectPath + "/assets/ImageEtape5/synthese2.png"));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void afficherImageDialog(JFrame parent, BufferedImage image, String titre, int x, int y) {
         JDialog dialog = new JDialog(parent, titre, false);

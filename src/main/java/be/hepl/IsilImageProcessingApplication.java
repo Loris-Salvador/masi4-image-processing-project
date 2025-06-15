@@ -6,6 +6,7 @@ import be.hepl.imageprocessing.contours.ContoursNonLineaire;
 import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseBasButterworth;
 import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseBasIdeal;
 import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseHautIdeal;
+import be.hepl.imageprocessing.filtragelineaire.Global.FourierLowPassFilter;
 import be.hepl.imageprocessing.filtragelineaire.Local.FiltreMoyenneur;
 import be.hepl.imageprocessing.filtragelineaire.Local.MasqueConvolution;
 import be.hepl.imageprocessing.histogramme.Histogramme;
@@ -191,7 +192,8 @@ public class IsilImageProcessingApplication extends JFrame {
             int frequency = (Integer)freqSpinner.getValue();
             switch (filterType){
                 case "Passe-bas ideal":
-                    result = FiltrePasseBasIdeal.filtrePasseBas(mat, frequency);
+                    //result = FiltrePasseBasIdeal.filtrePasseBasTF(mat, frequency);
+                    result = FourierLowPassFilter.apply(mat, frequency);
                     System.out.println("Filtre Passe-bas idéal avec fréquence: " + frequency);
 
                     break;

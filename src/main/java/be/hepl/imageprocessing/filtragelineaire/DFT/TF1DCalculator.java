@@ -24,6 +24,33 @@ public class TF1DCalculator{
         return dft;
     }
 
+    public static Complex[] ITF1D(Complex[] signalFreq) {
+        int N = signalFreq.length;
+        Complex[] idft = new Complex[N];
+
+        for (int n = 0; n < N; n++) {
+            double re = 0;
+            double im = 0;
+
+            for (int k = 0; k < N; k++) {
+                double angle = 2 * Math.PI * k * n / N;
+                double cos = Math.cos(angle);
+                double sin = Math.sin(angle);
+                double realPart = signalFreq[k].getReal();
+                double imagPart = signalFreq[k].getImaginary();
+
+                // (a + ib) * (cos + i sin) = (a cos - b sin) + i (a sin + b cos)
+                re += realPart * cos - imagPart * sin;
+                im += realPart * sin + imagPart * cos;
+            }
+
+            idft[n] = new Complex(re / N, im / N);
+        }
+
+        return idft;
+    }
+
+
 
     // test unitaire
     public static void main(String[] args) {

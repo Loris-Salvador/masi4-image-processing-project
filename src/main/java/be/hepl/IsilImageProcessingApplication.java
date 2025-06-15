@@ -925,5 +925,17 @@ public class IsilImageProcessingApplication extends JFrame {
         displayImage(currentImage);
     }
 
-    private void runApplication(String appNumber) {}
+    //Partie Loris ---------------------------------------------
+
+    private void runApplication(String appNumber) {
+        switch (appNumber) {
+            case "1":
+        }
+    }
+
+    private void applicationRehaussement() {
+
+    }
+
+    //----------------------------------------------------------
 }

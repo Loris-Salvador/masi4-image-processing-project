@@ -1,8 +1,9 @@
 package be.hepl.imageprocessing.applications;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class Rehaussement {
+public class Helper {
 
     public static int [][][] getRGB(BufferedImage image) {
 
@@ -53,10 +54,29 @@ public class Rehaussement {
         return image;
     }
 
+    public static BufferedImage matriceBinaireVersImage(int[][] matrice) {
+        int height = matrice.length;
+        int width = matrice[0].length;
+
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int value = matrice[y][x];
+                if (value == 1)
+                    image.setRGB(x, y, Color.WHITE.getRGB()); // blanc
+                else
+                    image.setRGB(x, y, Color.BLACK.getRGB()); // noir
+            }
+        }
+
+        return image;
+    }
+
 
     public static int[][] getLuminance(BufferedImage image) {
 
-        int [][][] imageRGB = Rehaussement.getRGB(image);
+        int [][][] imageRGB = Helper.getRGB(image);
 
         int[][] red = imageRGB[0];
         int[][] green = imageRGB[1];

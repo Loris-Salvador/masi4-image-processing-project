@@ -1,5 +1,7 @@
 package be.hepl.imageprocessing.seuillage;
 
+import java.awt.image.BufferedImage;
+
 public class Seuillage {
 
     public static int[][] seuillageSimple(int[][] image, int seuil) {
@@ -92,6 +94,4 @@ public class Seuillage {
 
         return result;
     }
-
-
 }

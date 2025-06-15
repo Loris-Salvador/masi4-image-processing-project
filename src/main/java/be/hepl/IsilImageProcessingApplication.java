@@ -1,6 +1,6 @@
 package be.hepl;
 
-import be.hepl.imageprocessing.applications.Rehaussement;
+import be.hepl.imageprocessing.applications.Helper;
 import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseBasIdeal;
 import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseHautIdeal;
 import be.hepl.imageprocessing.filtragelineaire.Local.FiltreMoyenneur;
@@ -17,9 +17,8 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.nio.Buffer;
 
-import static be.hepl.imageprocessing.applications.Rehaussement.recombineRGB;
 import static be.hepl.imageprocessing.contours.ContoursNonLineaire.*;
 import static be.hepl.imageprocessing.histogramme.HistogrammeUtils.convertToBufferedImage;
 import static be.hepl.imageprocessing.histogramme.HistogrammeUtils.convertToMatrix;
@@ -103,7 +102,7 @@ public class IsilImageProcessingApplication extends JFrame {
         JMenu histogramMenu = new JMenu("Histogramme");
         histogramMenu.add(createMenuItem("Afficher paramètres", e -> showImageParameters()));
 
-        JMenu enhanceMenu = new JMenu("Rehaussement");
+        JMenu enhanceMenu = new JMenu("Helper");
         enhanceMenu.add(createMenuItem("Transformation linéaire", e -> showLinearTransformDialog()));
         enhanceMenu.add(createMenuItem("Transformation linéaire avec saturation", e -> showSaturationDialog()));
         enhanceMenu.add(createMenuItem("Correction gamma", e -> showGammaDialog()));
@@ -937,6 +936,9 @@ public class IsilImageProcessingApplication extends JFrame {
         if (appNumber.equals("Application 2")){
             applicationRehaussement();
         }
+        else if(appNumber.equals("Application 3")) {
+            binaryRedBlue();
+        }
 
 
 
@@ -952,7 +954,7 @@ public class IsilImageProcessingApplication extends JFrame {
             //A --------------------------------------------------------
             BufferedImage image = ImageIO.read(new File(projectPath + "/assets/ImageEtape5/lenaAEgaliser.jpg"));
 
-            int [][][] imageRGB = Rehaussement.getRGB(image);
+            int [][][] imageRGB = Helper.getRGB(image);
 
 
             int[][] red = imageRGB[0];
@@ -967,12 +969,12 @@ public class IsilImageProcessingApplication extends JFrame {
             int[][] greenEgalise = Histogramme.rehaussement(green, courbeGreen);
             int[][] blueEgalise = Histogramme.rehaussement(blue, courbeBlue);
 
-            BufferedImage imageEgalisee = Rehaussement.recombineRGB(redEgalise, greenEgalise, blueEgalise);
+            BufferedImage imageEgalisee = Helper.recombineRGB(redEgalise, greenEgalise, blueEgalise);
 
 
             //B -------------------------------------------------------------------------
 
-            int[][] luminance = Rehaussement.getLuminance(image);
+            int[][] luminance = Helper.getLuminance(image);
 
             int[] courbeLuminance = Histogramme.creeCourbeTonaleEgalisation(luminance);
 
@@ -980,44 +982,66 @@ public class IsilImageProcessingApplication extends JFrame {
             greenEgalise = Histogramme.rehaussement(green, courbeLuminance);
             blueEgalise = Histogramme.rehaussement(blue, courbeLuminance);
 
-            BufferedImage imageLuminanceEgalisee = Rehaussement.recombineRGB(redEgalise, greenEgalise, blueEgalise);
+            BufferedImage imageLuminanceEgalisee = Helper.recombineRGB(redEgalise, greenEgalise, blueEgalise);
 
-            afficherOriginaleEtDeuxEgalisationsSeparées(this, image, imageEgalisee, imageLuminanceEgalisee);
+            // Affichage des trois images en ligne
+            Point location = this.getLocationOnScreen();
+            int offset = 20;
 
+            afficherImageDialog(this, image, "Image originale", location.x, location.y);
+            afficherImageDialog(this, imageEgalisee, "Égalisation RGB séparée", location.x + image.getWidth() + offset, location.y);
+            afficherImageDialog(this, imageLuminanceEgalisee, "Égalisation luminance", location.x + 2 * (image.getWidth() + offset), location.y);
         }
         catch (IOException e) {
 
         }
     }
 
-    public void afficherOriginaleEtDeuxEgalisationsSeparées(JFrame parent, BufferedImage original,
-                                                            BufferedImage egaliseRGB,
-                                                            BufferedImage egaliseLum) {
+    public void binaryRedBlue() {
+        String projectPath = System.getProperty("user.dir");
 
-        JDialog dialogOriginal = new JDialog(parent, "Image originale", false);
-        dialogOriginal.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialogOriginal.add(new JLabel(new ImageIcon(original)));
-        dialogOriginal.pack();
-        dialogOriginal.setLocationRelativeTo(parent);
-        dialogOriginal.setVisible(true);
+        try {
+            BufferedImage image = ImageIO.read(new File(projectPath + "/assets/ImageEtape5/petitsPois.png"));
 
-        JDialog dialogEgaliseRGB = new JDialog(parent, "Égalisation RGB séparée", false);
-        dialogEgaliseRGB.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialogEgaliseRGB.add(new JLabel(new ImageIcon(egaliseRGB)));
-        dialogEgaliseRGB.pack();
+            int[][] binaryRed = be.hepl.imageprocessing.applications.Seuillage.seuillageRouge(image);
 
-        JDialog dialogEgaliseLum = new JDialog(parent, "Égalisation luminance", false);
-        dialogEgaliseLum.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialogEgaliseLum.add(new JLabel(new ImageIcon(egaliseLum)));
-        dialogEgaliseLum.pack();
+            int[][] binaryBlue = be.hepl.imageprocessing.applications.Seuillage.seuillageBleu(image);
 
-        Point loc = dialogOriginal.getLocationOnScreen();
-        dialogEgaliseRGB.setLocation(loc.x + dialogOriginal.getWidth() + 10, loc.y);
-        dialogEgaliseLum.setLocation(loc.x + dialogOriginal.getWidth() + dialogEgaliseRGB.getWidth() + 20, loc.y);
+            binaryRed = MorphoElementaire.erosion(binaryRed, 5);
 
-        dialogEgaliseRGB.setVisible(true);
-        dialogEgaliseLum.setVisible(true);
+            binaryBlue = MorphoElementaire.erosion(binaryBlue, 5);
+
+            BufferedImage BinaryRedImage = Helper.matriceBinaireVersImage(binaryRed);
+
+            BufferedImage BinaryBlueImage = Helper.matriceBinaireVersImage(binaryBlue);
+
+            Point location = this.getLocationOnScreen();
+            int offset = 20;
+
+            afficherImageDialog(this, image, "Bleu", location.x, location.y);
+
+            afficherImageDialog(this, BinaryBlueImage, "Bleu", location.x, location.y);
+
+            afficherImageDialog(this, BinaryRedImage, "Rouge", location.x, location.y);
+        }
+        catch (IOException e)
+        {
+
+        }
+
+
+
     }
+
+    public void afficherImageDialog(JFrame parent, BufferedImage image, String titre, int x, int y) {
+        JDialog dialog = new JDialog(parent, titre, false);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.add(new JLabel(new ImageIcon(image)));
+        dialog.pack();
+        dialog.setLocation(x, y);
+        dialog.setVisible(true);
+    }
+
 
 
 

@@ -2,6 +2,7 @@ package be.hepl;
 
 import be.hepl.imageprocessing.applications.Helper;
 import be.hepl.imageprocessing.contours.ContoursLineaire;
+import be.hepl.imageprocessing.contours.ContoursNonLineaire;
 import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseBasButterworth;
 import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseBasIdeal;
 import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseHautIdeal;
@@ -950,6 +951,10 @@ public class IsilImageProcessingApplication extends JFrame {
         } else if (appNumber.equals("Application 6")) {
             vaisseau();
         }
+        else if (appNumber.equals("Application 7"))
+        {
+            tartine();
+        }
 
 
     }
@@ -1091,9 +1096,15 @@ public class IsilImageProcessingApplication extends JFrame {
             int[][] gradientVer = ContoursLineaire.gradientSobel(matrix, 2);
 
             int[][] amplitude = Helper.amplitudeGradient(gradientHor, gradientVer);
+
             int[][] seuillageAuto = Seuillage.seuillageAutomatique(amplitude);
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(seuillageAuto), "Outils remplis", location.x + 50, location.y + 50);
+
 
             int[][] contoursInverses = Helper.inverser(seuillageAuto);
+
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(contoursInverses), "Outils remplis", location.x + 50, location.y + 50);
+
 
             int[][] marqueur = new int[contoursInverses.length][contoursInverses[0].length];
             for (int y = 0; y < marqueur.length; y++) {
@@ -1104,14 +1115,17 @@ public class IsilImageProcessingApplication extends JFrame {
                 }
             }
 
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(marqueur), "marqueur", location.x + 50, location.y + 50);
+
+
 
             int[][] fondReconstruit = MorphoComplexe.reconstructionGeodesique(marqueur, contoursInverses);
+
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(fondReconstruit), "Outils remplis", location.x + 50, location.y + 50);
 
             int[][] objetsRemplis = Helper.inverser(fondReconstruit);
 
             afficherImageDialog(this, ImageConverter.convertToBufferedImage(objetsRemplis), "Outils remplis", location.x + 50, location.y + 50);
-
-
         }
         catch (IOException e) {
 
@@ -1203,6 +1217,55 @@ public class IsilImageProcessingApplication extends JFrame {
         }
     }
 
+    public void tartine() {
+        String projectPath = System.getProperty("user.dir");
+
+        try {
+            BufferedImage image = ImageIO.read(new File(projectPath + "/assets/ImageEtape5/Tartines.jpg"));
+            Point location = this.getLocationOnScreen();
+
+            int[][] matrix = ImageConverter.convertToMatrix(image);
+
+            // Ouverture morphologique
+            int[][] test = MorphoElementaire.ouverture(matrix, 51);
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(test), "Ouverture", location.x + 50, location.y + 50);
+
+            // Calcul des gradients Prewitt horizontal et vertical
+            int[][] gradientHor = ContoursNonLineaire.gradientBeucher(test);
+            int[][] gradientVer = ContoursNonLineaire.gradientBeucher(test);
+
+            // Calcul de l'amplitude du gradient
+            int[][] amplitude = Helper.amplitudeGradient(gradientHor, gradientVer);
+
+            // Seuillage automatique sur l'amplitude
+            int[][] seuillageAuto = Seuillage.seuillageAutomatique(amplitude);
+
+
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(seuillageAuto), "Seuillage automatique", location.x + 50, location.y + 50);
+
+            // Maintenant on trace les contours verts sur l'image originale
+            int hauteurContour = seuillageAuto.length;
+            int largeurContour = seuillageAuto[0].length;
+
+            for (int y = 0; y < image.getHeight(); y++) {
+                for (int x = 0; x < image.getWidth(); x++) {
+                    if (x < hauteurContour && y < largeurContour) {
+                        // On inverse x/y pour corriger l'orientation si besoin
+                        if (seuillageAuto[x][y] == 255) {
+                            image.setRGB(x, y, 0xFF00FF00); // Vert opaque ARGB
+                        }
+                    }
+                }
+            }
+
+            afficherImageDialog(this, image, "Image avec contours verts", location.x + 50, location.y + 50);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     public void afficherImageDialog(JFrame parent, BufferedImage image, String titre, int x, int y) {
         JDialog dialog = new JDialog(parent, titre, false);
@@ -1212,9 +1275,6 @@ public class IsilImageProcessingApplication extends JFrame {
         dialog.setLocation(x, y);
         dialog.setVisible(true);
     }
-
-
-
 
     //----------------------------------------------------------
 }

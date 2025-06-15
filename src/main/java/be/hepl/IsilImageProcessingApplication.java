@@ -1,5 +1,6 @@
 package be.hepl;
 
+import be.hepl.imageprocessing.applications.Rehaussement;
 import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseBasIdeal;
 import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseHautIdeal;
 import be.hepl.imageprocessing.filtragelineaire.Local.FiltreMoyenneur;
@@ -14,8 +15,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
+import static be.hepl.imageprocessing.applications.Rehaussement.recombineRGB;
 import static be.hepl.imageprocessing.contours.ContoursNonLineaire.*;
 import static be.hepl.imageprocessing.histogramme.HistogrammeUtils.convertToBufferedImage;
 import static be.hepl.imageprocessing.histogramme.HistogrammeUtils.convertToMatrix;
@@ -925,5 +929,97 @@ public class IsilImageProcessingApplication extends JFrame {
         displayImage(currentImage);
     }
 
-    private void runApplication(String appNumber) {}
+    //Partie Loris ---------------------------------------------
+
+    private void runApplication(String appNumber) {
+        System.out.println(appNumber);
+
+        if (appNumber.equals("Application 2")){
+            applicationRehaussement();
+        }
+
+
+
+
+    }
+
+    private void applicationRehaussement() {
+
+
+        try {
+            String projectPath = System.getProperty("user.dir");
+
+            //A --------------------------------------------------------
+            BufferedImage image = ImageIO.read(new File(projectPath + "/assets/ImageEtape5/lenaAEgaliser.jpg"));
+
+            int [][][] imageRGB = Rehaussement.getRGB(image);
+
+
+            int[][] red = imageRGB[0];
+            int[][] green = imageRGB[1];
+            int[][] blue = imageRGB[2];
+
+            int[] courbeRed = Histogramme.creeCourbeTonaleEgalisation(red);
+            int[] courbeGreen = Histogramme.creeCourbeTonaleEgalisation(green);
+            int[] courbeBlue = Histogramme.creeCourbeTonaleEgalisation(blue);
+
+            int[][] redEgalise = Histogramme.rehaussement(red, courbeRed);
+            int[][] greenEgalise = Histogramme.rehaussement(green, courbeGreen);
+            int[][] blueEgalise = Histogramme.rehaussement(blue, courbeBlue);
+
+            BufferedImage imageEgalisee = Rehaussement.recombineRGB(redEgalise, greenEgalise, blueEgalise);
+
+
+            //B -------------------------------------------------------------------------
+
+            int[][] luminance = Rehaussement.getLuminance(image);
+
+            int[] courbeLuminance = Histogramme.creeCourbeTonaleEgalisation(luminance);
+
+            redEgalise = Histogramme.rehaussement(red, courbeLuminance);
+            greenEgalise = Histogramme.rehaussement(green, courbeLuminance);
+            blueEgalise = Histogramme.rehaussement(blue, courbeLuminance);
+
+            BufferedImage imageLuminanceEgalisee = Rehaussement.recombineRGB(redEgalise, greenEgalise, blueEgalise);
+
+            afficherOriginaleEtDeuxEgalisationsSeparées(this, image, imageEgalisee, imageLuminanceEgalisee);
+
+        }
+        catch (IOException e) {
+
+        }
+    }
+
+    public void afficherOriginaleEtDeuxEgalisationsSeparées(JFrame parent, BufferedImage original,
+                                                            BufferedImage egaliseRGB,
+                                                            BufferedImage egaliseLum) {
+
+        JDialog dialogOriginal = new JDialog(parent, "Image originale", false);
+        dialogOriginal.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialogOriginal.add(new JLabel(new ImageIcon(original)));
+        dialogOriginal.pack();
+        dialogOriginal.setLocationRelativeTo(parent);
+        dialogOriginal.setVisible(true);
+
+        JDialog dialogEgaliseRGB = new JDialog(parent, "Égalisation RGB séparée", false);
+        dialogEgaliseRGB.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialogEgaliseRGB.add(new JLabel(new ImageIcon(egaliseRGB)));
+        dialogEgaliseRGB.pack();
+
+        JDialog dialogEgaliseLum = new JDialog(parent, "Égalisation luminance", false);
+        dialogEgaliseLum.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialogEgaliseLum.add(new JLabel(new ImageIcon(egaliseLum)));
+        dialogEgaliseLum.pack();
+
+        Point loc = dialogOriginal.getLocationOnScreen();
+        dialogEgaliseRGB.setLocation(loc.x + dialogOriginal.getWidth() + 10, loc.y);
+        dialogEgaliseLum.setLocation(loc.x + dialogOriginal.getWidth() + dialogEgaliseRGB.getWidth() + 20, loc.y);
+
+        dialogEgaliseRGB.setVisible(true);
+        dialogEgaliseLum.setVisible(true);
+    }
+
+
+
+    //----------------------------------------------------------
 }

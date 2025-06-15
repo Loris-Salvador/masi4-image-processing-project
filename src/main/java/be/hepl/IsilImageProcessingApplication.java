@@ -1,6 +1,8 @@
 package be.hepl;
 
 import be.hepl.imageprocessing.applications.Helper;
+import be.hepl.imageprocessing.contours.ContoursLineaire;
+import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseBasButterworth;
 import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseBasIdeal;
 import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseHautIdeal;
 import be.hepl.imageprocessing.filtragelineaire.Local.FiltreMoyenneur;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.nio.Buffer;
 
 import static be.hepl.imageprocessing.contours.ContoursNonLineaire.*;
+import static be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseBasButterworth.butterworthLowPassFilter;
 import static be.hepl.imageprocessing.nonlineaire.MorphoComplexe.filtreMedianCouleur;
 import static be.hepl.imageprocessing.contours.ContoursLineaire.*;
 import static be.hepl.imageprocessing.seuillage.Seuillage.*;
@@ -942,9 +945,9 @@ public class IsilImageProcessingApplication extends JFrame {
         }
         else if(appNumber.equals("Application 4")) {
             balanes();
+        } else if (appNumber.equals("Application 5")) {
+            tools();
         }
-
-
 
 
     }
@@ -1065,6 +1068,47 @@ public class IsilImageProcessingApplication extends JFrame {
             afficherImageDialog(this, ImageConverter.convertToBufferedImage(BigGris), "Grosses", location.x, location.y);
             
             afficherImageDialog(this, ImageConverter.convertToBufferedImage(PetitesGris), "Petites", location.x, location.y);
+
+        }
+        catch (IOException e) {
+
+        }
+    }
+
+    public void tools() {
+        String projectPath = System.getProperty("user.dir");
+
+        try {
+            BufferedImage image = ImageIO.read(new File(projectPath + "/assets/ImageEtape5/tools.png"));
+
+            Point location = this.getLocationOnScreen();
+
+            int[][] matrix = ImageConverter.convertToMatrix(image);
+
+            int[][] gradientHor = ContoursLineaire.gradientSobel(matrix, 1);
+            int[][] gradientVer = ContoursLineaire.gradientSobel(matrix, 2);
+
+            int[][] amplitude = Helper.amplitudeGradient(gradientHor, gradientVer);
+            int[][] seuillageAuto = Seuillage.seuillageAutomatique(amplitude);
+
+            int[][] contoursInverses = Helper.inverser(seuillageAuto);
+
+            int[][] marqueur = new int[contoursInverses.length][contoursInverses[0].length];
+            for (int y = 0; y < marqueur.length; y++) {
+                for (int x = 0; x < marqueur[0].length; x++) {
+                    if (y == 0 || y == marqueur.length - 1 || x == 0 || x == marqueur[0].length - 1) {
+                        marqueur[y][x] = 255;
+                    }
+                }
+            }
+
+
+            int[][] fondReconstruit = MorphoComplexe.reconstructionGeodesique(marqueur, contoursInverses);
+
+            int[][] objetsRemplis = Helper.inverser(fondReconstruit);
+
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(objetsRemplis), "Outils remplis", location.x + 50, location.y + 50);
+
 
         }
         catch (IOException e) {

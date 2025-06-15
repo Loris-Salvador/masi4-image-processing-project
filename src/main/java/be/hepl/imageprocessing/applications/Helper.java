@@ -129,6 +129,36 @@ public class Helper {
         return res;
     }
 
+    public static int[][] amplitudeGradient(int[][] gradX, int[][] gradY) {
+        int h = gradX.length;
+        int w = gradX[0].length;
+        int[][] amplitude = new int[h][w];
+
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int gx = gradX[y][x];
+                int gy = gradY[y][x];
+
+                // Calcule la norme euclidienne
+                int val = (int) Math.min(255, Math.sqrt(gx * gx + gy * gy));
+                amplitude[y][x] = val;
+            }
+        }
+        return amplitude;
+    }
+
+    public static int[][] inverser(int[][] image) {
+        int h = image.length;
+        int w = image[0].length;
+        int[][] res = new int[h][w];
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                res[y][x] = (image[y][x] == 255) ? 0 : 255;
+            }
+        }
+        return res;
+    }
+
 
 
 }

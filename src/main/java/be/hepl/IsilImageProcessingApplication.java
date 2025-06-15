@@ -9,6 +9,7 @@ import be.hepl.imageprocessing.histogramme.Histogramme;
 import be.hepl.imageprocessing.nonlineaire.MorphoComplexe;
 import be.hepl.imageprocessing.nonlineaire.MorphoElementaire;
 import be.hepl.imageprocessing.seuillage.Seuillage;
+import be.hepl.imageprocessing.utils.ImageConverter;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -20,11 +21,11 @@ import java.io.IOException;
 import java.nio.Buffer;
 
 import static be.hepl.imageprocessing.contours.ContoursNonLineaire.*;
-import static be.hepl.imageprocessing.histogramme.HistogrammeUtils.convertToBufferedImage;
-import static be.hepl.imageprocessing.histogramme.HistogrammeUtils.convertToMatrix;
 import static be.hepl.imageprocessing.nonlineaire.MorphoComplexe.filtreMedianCouleur;
 import static be.hepl.imageprocessing.contours.ContoursLineaire.*;
 import static be.hepl.imageprocessing.seuillage.Seuillage.*;
+import static be.hepl.imageprocessing.utils.ImageConverter.convertToBufferedImage;
+import static be.hepl.imageprocessing.utils.ImageConverter.convertToMatrix;
 
 
 public class IsilImageProcessingApplication extends JFrame {
@@ -939,6 +940,9 @@ public class IsilImageProcessingApplication extends JFrame {
         else if(appNumber.equals("Application 3")) {
             binaryRedBlue();
         }
+        else if(appNumber.equals("Application 4")) {
+            balanes();
+        }
 
 
 
@@ -1028,9 +1032,44 @@ public class IsilImageProcessingApplication extends JFrame {
         {
 
         }
+    }
 
+    public void balanes() {
+        String projectPath = System.getProperty("user.dir");
 
+        try {
+            BufferedImage image = ImageIO.read(new File(projectPath + "/assets/ImageEtape5/balanes.png"));
 
+            Point location = this.getLocationOnScreen();
+
+            int[][] imageMatrice = ImageConverter.convertToMatrix(image);
+
+            int [][] imageSeuil = Seuillage.seuillageSimple(imageMatrice, 100);
+
+            int [][] erosion = MorphoElementaire.erosion(imageSeuil, 13); //enelve paraistes + petites
+
+            int [][] BigReconstruit = MorphoComplexe.reconstructionGeodesique(erosion, imageSeuil);
+
+            int[][] BigGris = Helper.appliquerMasque(BigReconstruit, imageMatrice);
+
+            int[][] seuilSoustrait = Helper.soustractionBinaire(imageSeuil, BigReconstruit);
+
+            int[][] erosionPetites = MorphoElementaire.erosion(seuilSoustrait, 5); //enleve parasites
+
+            int[][] petiteReconstruit = MorphoComplexe.reconstructionGeodesique(erosionPetites, imageSeuil);
+
+            int[][] PetitesGris = Helper.appliquerMasque(petiteReconstruit, imageMatrice);
+
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(imageMatrice), "Originale", location.x, location.y);
+
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(BigGris), "Grosses", location.x, location.y);
+            
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(PetitesGris), "Petites", location.x, location.y);
+
+        }
+        catch (IOException e) {
+
+        }
     }
 
     public void afficherImageDialog(JFrame parent, BufferedImage image, String titre, int x, int y) {

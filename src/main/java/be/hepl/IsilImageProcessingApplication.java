@@ -395,11 +395,13 @@ public class IsilImageProcessingApplication extends JFrame {
         }
 
 
-        JFileChooser chooser = new JFileChooser();
-        if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
+        String projectPath = System.getProperty("user.dir");
+        JFileChooser fileChooser = new JFileChooser(projectPath + "/assets/images");
+
+        if (fileChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
 
         try {
-            BufferedImage maskImage = ImageIO.read(chooser.getSelectedFile());
+            BufferedImage maskImage = ImageIO.read(fileChooser.getSelectedFile());
 
 
             if (maskImage.getWidth() != currentImage.getWidth() ||

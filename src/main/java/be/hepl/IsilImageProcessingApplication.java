@@ -198,7 +198,8 @@ public class IsilImageProcessingApplication extends JFrame {
 
                     break;
                 case "Passe-haut ideal":
-                    result = FiltrePasseHautIdeal.filtrePasseHaut(mat, frequency);
+                    //result = FiltrePasseHautIdeal.filtrePasseHaut(mat, frequency);
+                    result = FourierLowPassFilter.apply(mat, frequency);
                     System.out.println("Filtre Passe-haut idéal avec fréquence: " + frequency);
                     break;
 

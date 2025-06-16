@@ -5,7 +5,7 @@ import be.hepl.imageprocessing.filtragelineaire.Complexe.Complex;
 import static be.hepl.imageprocessing.filtragelineaire.DFT.Fourier.itf2d;
 import static be.hepl.imageprocessing.filtragelineaire.DFT.Fourier.tf2d;
 
-public class FourierLowPassFilter {
+public class FourierHighPassFilter {
 
     public static int[][] apply(int[][] image, int rayon) {
         int hauteur = image.length;
@@ -22,18 +22,17 @@ public class FourierLowPassFilter {
         // Transformée de Fourier 2D
         Complex[][] freq = tf2d(imageCentered);
 
-        // Application du filtre passe-bas idéal
-        filterLowPass(freq, rayon);
+        // Application du filtre passe-haut
+        filterHighPass(freq, rayon);
 
         // Transformée de Fourier inverse 2D
         double[][] imageFiltered = itf2d(freq);
 
-        // Réappliquer (-1)^{x+y}
         int[][] resultat = new int[hauteur][largeur];
         double min = Double.MAX_VALUE;
         double max = Double.MIN_VALUE;
 
-        // Normalisation et réapplication de (-1)^{x+y}
+        // Réappliquer (-1)^{x+y}
         for (int y = 0; y < hauteur; y++) {
             for (int x = 0; x < largeur; x++) {
                 imageFiltered[y][x] *= Math.pow(-1, x + y);
@@ -42,7 +41,9 @@ public class FourierLowPassFilter {
             }
         }
 
+
         // Mise à l'échelle entre 0 et 255
+
         for (int y = 0; y < hauteur; y++) {
             for (int x = 0; x < largeur; x++) {
                 resultat[y][x] = (int) (255 * (imageFiltered[y][x] - min) / (max - min));
@@ -52,20 +53,20 @@ public class FourierLowPassFilter {
         return resultat;
     }
 
-    public static void filterLowPass(Complex[][] freq, int rayon) {
+
+    public static void filterHighPass(Complex[][] freq, int rayon) {
         int hauteur = freq.length;
         int largeur = freq[0].length;
         int centreY = hauteur / 2;
         int centreX = largeur / 2;
 
-        // Application du filtre passe-bas idéal
+        // Application du filtre passe-haut idéal
         for (int y = 0; y < hauteur; y++) {
             for (int x = 0; x < largeur; x++) {
-                // Calcul de la distance au centre
-                double dist = Math.sqrt(Math.pow(x - centreX, 2) + Math.pow(y - centreY, 2));
 
-                // Si la distance est supérieure au rayon, on met le coefficient à zéro
-                if (dist > rayon) {
+                // Calcul de la distance du pixel au centre
+                double dist = Math.sqrt(Math.pow(x - centreX, 2) + Math.pow(y - centreY, 2));
+                if (dist <= rayon) {
                     freq[y][x] = new Complex(0, 0);
                 }
             }

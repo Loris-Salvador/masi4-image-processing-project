@@ -676,7 +676,7 @@ public class IsilImageProcessingApplication extends JFrame {
     // Méthode utilitaire pour afficher un histogramme
     private void afficherHistogramme(int[] histogramme, String titre)
     {
-        JFrame histFrame = new JFrame("Histogramme en niveaux de gris");
+        JFrame histFrame = new JFrame(titre);
         histFrame.setSize(600, 400);
         histFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

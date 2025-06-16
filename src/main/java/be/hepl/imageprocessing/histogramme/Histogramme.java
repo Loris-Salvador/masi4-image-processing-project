@@ -19,7 +19,8 @@ public class Histogramme {
 
     // Méthodes pour l'étape 3
     //Parcourt l’image pour trouver le pixel le plus sombre, plus petit niveau de gris
-    public static int minimum(int[][] image) {
+    public static int minimum(int[][] image)
+    {
         int min = 255;
         for (int[] row : image) {
             for (int pixel : row) {

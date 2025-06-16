@@ -2,8 +2,6 @@ package be.hepl.imageprocessing.filtragelineaire.Global;
 
 import be.hepl.imageprocessing.filtragelineaire.Complexe.Complex;
 
-import static be.hepl.imageprocessing.filtragelineaire.DFT.Fourier.itf2d;
-import static be.hepl.imageprocessing.filtragelineaire.DFT.Fourier.tf2d;
 
 public class LowPassFilter {
 

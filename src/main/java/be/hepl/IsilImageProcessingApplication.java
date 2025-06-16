@@ -103,7 +103,7 @@ public class IsilImageProcessingApplication extends JFrame {
         JMenu histogramMenu = new JMenu("Histogramme");
         histogramMenu.add(createMenuItem("Afficher paramètres", e -> showImageParameters()));
 
-        JMenu enhanceMenu = new JMenu("Helper");
+        JMenu enhanceMenu = new JMenu("Courbe tonale");
         enhanceMenu.add(createMenuItem("Transformation linéaire", e -> showLinearTransformDialog()));
         enhanceMenu.add(createMenuItem("Transformation linéaire avec saturation", e -> showSaturationDialog()));
         enhanceMenu.add(createMenuItem("Correction gamma", e -> showGammaDialog()));
@@ -364,8 +364,7 @@ public class IsilImageProcessingApplication extends JFrame {
         }
 
         String projectPath = System.getProperty("user.dir");
-        String imagePath = projectPath + "/src/main/java/be/hepl/saves";
-        JFileChooser fileChooser = new JFileChooser(imagePath);
+        JFileChooser fileChooser = new JFileChooser(projectPath + "/assets/images");
         fileChooser.setDialogTitle("Enregistrer l'image");
 
         if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {

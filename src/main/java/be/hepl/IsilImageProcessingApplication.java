@@ -3,9 +3,7 @@ package be.hepl;
 import be.hepl.imageprocessing.applications.Helper;
 import be.hepl.imageprocessing.contours.ContoursLineaire;
 import be.hepl.imageprocessing.contours.ContoursNonLineaire;
-import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseBasButterworth;
-import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseHautButterworth;
-import be.hepl.imageprocessing.filtragelineaire.Global.FourierLowPassFilter;
+import be.hepl.imageprocessing.filtragelineaire.Global.GlobalFilter;
 import be.hepl.imageprocessing.filtragelineaire.Local.FiltreMoyenneur;
 import be.hepl.imageprocessing.filtragelineaire.Local.MasqueConvolution;
 import be.hepl.imageprocessing.histogramme.Histogramme;
@@ -189,14 +187,12 @@ public class IsilImageProcessingApplication extends JFrame {
             int frequency = (Integer)freqSpinner.getValue();
             switch (filterType){
                 case "Passe-bas ideal":
-                    //result = FiltrePasseBasIdeal.filtrePasseBasTF(mat, frequency);
-                    result = FourierLowPassFilter.apply(mat, frequency);
+                    result = GlobalFilter.applyIdealLowPassFilter(mat, frequency);
                     System.out.println("Filtre Passe-bas idéal avec fréquence: " + frequency);
 
                     break;
                 case "Passe-haut ideal":
-                    //result = FiltrePasseHautIdeal.filtrePasseHaut(mat, frequency);
-                    result = FourierLowPassFilter.apply(mat, frequency);
+                    result = GlobalFilter.applyIdealHighPassFilter(mat, frequency);
                     System.out.println("Filtre Passe-haut idéal avec fréquence: " + frequency);
                     break;
 
@@ -226,12 +222,11 @@ public class IsilImageProcessingApplication extends JFrame {
             int order = (Integer)orderSpinner.getValue();
             switch (filterType){
                 case "Passe-bas Butterworth":
-                    result = FiltrePasseBasButterworth.applyButterworthLowPass(mat, frequency, 1);
+                    result = GlobalFilter.applyButterworthLowPassFilter(mat, frequency, 1);
                     System.out.println("Filtre Passe-bas Butterworth avec fréquence: " + frequency);
                     break;
                 case "Passe-haut Butterworth":
-                    // currentImage = FiltrageLineaireGlobal.filtrePasseHautButterworth(currentImage, frequency, 1);
-                    result = FiltrePasseHautButterworth.butterworthHighPassFilter(mat, frequency, order);
+                    result = GlobalFilter.applyButterworthHighPassFilter(mat, frequency, order);
                     System.out.println("Filtre Passe-haut Butterworth avec fréquence: " + frequency);
                     break;
             }

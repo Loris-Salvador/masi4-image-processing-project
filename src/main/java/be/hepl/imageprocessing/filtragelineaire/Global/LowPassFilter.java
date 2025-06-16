@@ -5,7 +5,7 @@ import be.hepl.imageprocessing.filtragelineaire.Complexe.Complex;
 import static be.hepl.imageprocessing.filtragelineaire.DFT.Fourier.itf2d;
 import static be.hepl.imageprocessing.filtragelineaire.DFT.Fourier.tf2d;
 
-public class FourierLowPassFilter {
+public class LowPassFilter {
 
     public static int[][] apply(int[][] image, int rayon) {
         int hauteur = image.length;

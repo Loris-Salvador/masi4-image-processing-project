@@ -974,10 +974,34 @@ public class IsilImageProcessingApplication extends JFrame {
 
             int[][] matrix = ImageConverter.convertToMatrix(image);
 
-            int[][] test = MorphoElementaire.ouverture(matrix, 5);
+            int[][] result = MorphoElementaire.ouverture(matrix, 3);
+            result = MorphoElementaire.fermeture(result, 3);
+
+            result = MorphoComplexe.filtreMedian(result, 5);
+
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(result), "entre", location.x, location.y);
 
 
-            afficherImageDialog(this, ImageConverter.convertToBufferedImage(test), "Image originale", location.x, location.y);
+            result = MorphoElementaire.fermeture(result, 5);
+
+
+            afficherImageDialog(this, image, "Image originale", location.x, location.y);
+
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(result), "Resultat", location.x, location.y);
+
+            image = ImageIO.read(new File(projectPath + "/assets/ImageEtape5/imageBruitee2.png"));
+
+            matrix = ImageConverter.convertToMatrix(image);
+
+            result = MorphoComplexe.filtreMedian(matrix, 3);
+
+            result = MorphoComplexe.filtreMedian(result, 3);
+
+            afficherImageDialog(this, image, "Image originale", location.x, location.y);
+
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(result), "Resultat", location.x, location.y);
+
+
 
         }
         catch (IOException e) {
@@ -1143,7 +1167,6 @@ public class IsilImageProcessingApplication extends JFrame {
             }
 
             afficherImageDialog(this, ImageConverter.convertToBufferedImage(marqueur), "marqueur", location.x + 50, location.y + 50);
-
 
 
             int[][] fondReconstruit = MorphoComplexe.reconstructionGeodesique(marqueur, contoursInverses);

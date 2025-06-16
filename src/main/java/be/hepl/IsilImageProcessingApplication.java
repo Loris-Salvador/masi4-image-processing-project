@@ -19,6 +19,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import static be.hepl.imageprocessing.contours.ContoursNonLineaire.*;
 import static be.hepl.imageprocessing.nonlineaire.MorphoComplexe.filtreMedianCouleur;
@@ -671,43 +672,78 @@ public class IsilImageProcessingApplication extends JFrame {
     }
 
     // Méthode utilitaire pour afficher un histogramme
-    private void afficherHistogramme(int[] hist, String titre)
+    private void afficherHistogramme(int[] histogramme, String titre)
     {
-        int histWidth = 512;
-        int histHeight = 400;
-        BufferedImage histImage = new BufferedImage(histWidth, histHeight, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2d = histImage.createGraphics();
+        JFrame histFrame = new JFrame("Histogramme en niveaux de gris");
+        histFrame.setSize(600, 400);
+        histFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // Fond blanc
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, histWidth, histHeight);
+        JPanel histPanel = new JPanel()
+        {
+            protected void paintComponent(Graphics g)
+            {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
 
-        // Trouver le max pour la mise à l'échelle
-        int maxCount = 0;
-        for (int count : hist) {
-            if (count > maxCount) maxCount = count;
-        }
+                int width = getWidth();
+                int height = getHeight();
 
-        // Dessiner l'histogramme
-        g2d.setColor(Color.BLUE);
-        int binWidth = histWidth / 256;
-        for (int i = 0; i < 256; i++) {
-            int height = (int)(((double)hist[i] / maxCount) * (histHeight - 20));
-            g2d.fillRect(i * binWidth, histHeight - height, binWidth, height);
-        }
+                int padding = 50;
+                int histHeight = height - 2 * padding;
+                int histWidth = width - 2 * padding;
 
-        // Ajouter des étiquettes
-        g2d.setColor(Color.BLACK);
-        g2d.drawString(titre, 10, 20);
-        g2d.drawString("0", 5, histHeight - 5);
-        g2d.drawString("255", histWidth - 30, histHeight - 5);
+                int binWidth = histWidth / 256;
 
-        // Afficher dans une fenêtre
-        JFrame frame = new JFrame("Histogramme - " + titre);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.add(new JLabel(new ImageIcon(histImage)));
-        frame.pack();
-        frame.setVisible(true);
+                // Fond blanc
+                g2d.setColor(Color.WHITE);
+                g2d.fillRect(0, 0, width, height);
+
+                // Grille de fond
+                g2d.setColor(new Color(230, 230, 230));
+                for (int i = 0; i <= 5; i++)
+                {
+                    int y = padding + i * histHeight / 5;
+                    g2d.drawLine(padding, y, padding + histWidth, y);
+                }
+
+                // Calcul du max
+                int maxCount = Arrays.stream(histogramme).max().getAsInt();
+
+                // Dessin de l'histogramme
+                g2d.setColor(Color.BLACK);
+                for (int i = 0; i < 256; i++) {
+                    int value = histogramme[i];
+                    int barHeight = (int) ((double) value / maxCount * histHeight);
+                    int x = padding + i * binWidth;
+                    int y = padding + histHeight - barHeight;
+                    g2d.fillRect(x, y, binWidth, barHeight);
+                }
+
+                // Axe X avec graduations
+                g2d.setColor(Color.BLACK);
+                for (int i = 0; i <= 255; i += 64) {
+                    int x = padding + i * binWidth;
+                    g2d.drawLine(x, padding + histHeight, x, padding + histHeight + 5);
+                    g2d.drawString(String.valueOf(i), x - 10, padding + histHeight + 20);
+                }
+                g2d.drawString("Niveaux de gris", padding + histWidth / 2 - 30, padding + histHeight + 40);
+
+                // Axe Y
+                for (int i = 0; i <= 5; i++) {
+                    int y = padding + i * histHeight / 5;
+                    int val = maxCount - i * maxCount / 5;
+                    g2d.drawLine(padding - 5, y, padding, y);
+                    g2d.drawString(String.valueOf(val), padding - 40, y + 5);
+                }
+                g2d.drawString("FrÃ©quence", 10, padding - 10);
+
+                // Bordure
+                g2d.drawRect(padding, padding, histWidth, histHeight);
+            }
+        };
+
+        histFrame.add(histPanel);
+        histFrame.setVisible(true);
     }
 
     private void showPrewittDialog() {

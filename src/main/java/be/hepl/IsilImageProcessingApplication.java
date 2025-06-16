@@ -1230,25 +1230,25 @@ public class IsilImageProcessingApplication extends JFrame {
             int[][] matrix = ImageConverter.convertToMatrix(image);
 
             int[][] seuillageAuto = Seuillage.seuillageAutomatique(matrix);
-            afficherImageDialog(this, ImageConverter.convertToBufferedImage(seuillageAuto), "test", location.x, location.y);
+            //afficherImageDialog(this, ImageConverter.convertToBufferedImage(seuillageAuto), "seuillageAuto", location.x, location.y);
 
             int[][] petitVaisseau = MorphoElementaire.erosion(seuillageAuto, 15);
             int[][] reconstructionVaisseaux = MorphoComplexe.reconstructionGeodesique(petitVaisseau, seuillageAuto);
-            afficherImageDialog(this, ImageConverter.convertToBufferedImage(reconstructionVaisseaux), "test", location.x, location.y);
+            //afficherImageDialog(this, ImageConverter.convertToBufferedImage(reconstructionVaisseaux), "reconstructionVaisseaux", location.x, location.y);
 
             int[][] GrosVaisseau = MorphoElementaire.erosion(seuillageAuto, 25);
-            afficherImageDialog(this, ImageConverter.convertToBufferedImage(GrosVaisseau), "test", location.x, location.y);
+            //afficherImageDialog(this, ImageConverter.convertToBufferedImage(GrosVaisseau), "GrosVaisseau", location.x, location.y);
             int[][] reconstructionGrosVaisseau = MorphoComplexe.reconstructionGeodesique(GrosVaisseau, seuillageAuto);
-            afficherImageDialog(this, ImageConverter.convertToBufferedImage(reconstructionGrosVaisseau), "test", location.x, location.y);
+            //afficherImageDialog(this, ImageConverter.convertToBufferedImage(reconstructionGrosVaisseau), "reconstructionGrosVaisseau", location.x, location.y);
 
             int[][] petitVaisseauEntier = Helper.soustractionBinaire(reconstructionVaisseaux, reconstructionGrosVaisseau);
 
             int tailleMasque = 9;
             int[][] petitVaisseauNettoye = MorphoElementaire.fermeture(petitVaisseauEntier, tailleMasque);
-            afficherImageDialog(this, ImageConverter.convertToBufferedImage(petitVaisseauNettoye), "Petit vaisseau nettoyé", location.x, location.y);
+            //afficherImageDialog(this, ImageConverter.convertToBufferedImage(petitVaisseauNettoye), "Petit vaisseau nettoyé", location.x, location.y);
 
             BufferedImage petitRGBNettoye = Helper.appliquerMasqueCouleur(image, petitVaisseauNettoye);
-            afficherImageDialog(this, petitRGBNettoye, "Petit vaisseau coloré nettoyé", location.x, location.y);
+            //afficherImageDialog(this, petitRGBNettoye, "Petit vaisseau coloré nettoyé", location.x, location.y);
 
             BufferedImage planete = ImageIO.read(new File(projectPath + "/assets/ImageEtape5/planete.jpg"));
 
@@ -1266,11 +1266,11 @@ public class IsilImageProcessingApplication extends JFrame {
 
             int[][] dilatePetitVaisseau = MorphoElementaire.dilatation(petitVaisseauNettoye, 3);
 
-            afficherImageDialog(this, ImageConverter.convertToBufferedImage(dilatePetitVaisseau), "Petit vaisseau coloré nettoyé", location.x, location.y);
+            //afficherImageDialog(this, ImageConverter.convertToBufferedImage(dilatePetitVaisseau), "dilatePetitVaisseau", location.x, location.y);
 
             int[][] contourPetitVaisseau = Helper.soustractionBinaire(dilatePetitVaisseau, petitVaisseauNettoye);
 
-            afficherImageDialog(this, ImageConverter.convertToBufferedImage(contourPetitVaisseau), "Petit vaisseau coloré nettoyé", location.x, location.y);
+            //afficherImageDialog(this, ImageConverter.convertToBufferedImage(contourPetitVaisseau), "contourPetitVaisseau", location.x, location.y);
 
 
             BufferedImage planeteAvecContour = ImageIO.read(new File(projectPath + "/assets/ImageEtape5/planete.jpg"));

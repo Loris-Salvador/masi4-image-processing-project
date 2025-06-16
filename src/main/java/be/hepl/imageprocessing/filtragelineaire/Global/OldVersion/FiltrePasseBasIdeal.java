@@ -1,7 +1,5 @@
-package be.hepl.imageprocessing.filtragelineaire.Global;
+package be.hepl.imageprocessing.filtragelineaire.Global.OldVersion;
 
-import be.hepl.imageprocessing.filtragelineaire.Complexe.Complex;
-import be.hepl.imageprocessing.filtragelineaire.DFT.TF2DCalculator;
 
 public class FiltrePasseBasIdeal {
 

@@ -4,8 +4,7 @@ import be.hepl.imageprocessing.applications.Helper;
 import be.hepl.imageprocessing.contours.ContoursLineaire;
 import be.hepl.imageprocessing.contours.ContoursNonLineaire;
 import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseBasButterworth;
-import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseBasIdeal;
-import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseHautIdeal;
+import be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseHautButterworth;
 import be.hepl.imageprocessing.filtragelineaire.Global.FourierLowPassFilter;
 import be.hepl.imageprocessing.filtragelineaire.Local.FiltreMoyenneur;
 import be.hepl.imageprocessing.filtragelineaire.Local.MasqueConvolution;
@@ -22,10 +21,8 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.Buffer;
 
 import static be.hepl.imageprocessing.contours.ContoursNonLineaire.*;
-import static be.hepl.imageprocessing.filtragelineaire.Global.FiltrePasseBasButterworth.butterworthLowPassFilter;
 import static be.hepl.imageprocessing.nonlineaire.MorphoComplexe.filtreMedianCouleur;
 import static be.hepl.imageprocessing.contours.ContoursLineaire.*;
 import static be.hepl.imageprocessing.seuillage.Seuillage.*;
@@ -204,8 +201,6 @@ public class IsilImageProcessingApplication extends JFrame {
                     break;
 
             }
-            // Appeler la méthode de filtrage appropriée
-            // currentImage = FiltrageLineaireGlobal.filtrePasseBasIdeal(currentImage, frequency);
             currentImage = convertToBufferedImage(result);
             displayImage(currentImage);
         }
@@ -214,6 +209,9 @@ public class IsilImageProcessingApplication extends JFrame {
     private void showButterworthDialog(String filterType) {
         JSpinner freqSpinner = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
         JSpinner orderSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
+
+        int[][] mat = convertToMatrix(currentImage);
+        int[][] result = mat;
 
         Object[] message = {
                 "Fréquence de coupure:", freqSpinner,
@@ -228,16 +226,17 @@ public class IsilImageProcessingApplication extends JFrame {
             int order = (Integer)orderSpinner.getValue();
             switch (filterType){
                 case "Passe-bas Butterworth":
-                    // currentImage = FiltrageLineaireGlobal.filtrePasseBasButterworth(currentImage, frequency, 1);
+                    result = FiltrePasseBasButterworth.applyButterworthLowPass(mat, frequency, 1);
                     System.out.println("Filtre Passe-bas Butterworth avec fréquence: " + frequency);
                     break;
                 case "Passe-haut Butterworth":
                     // currentImage = FiltrageLineaireGlobal.filtrePasseHautButterworth(currentImage, frequency, 1);
+                    result = FiltrePasseHautButterworth.butterworthHighPassFilter(mat, frequency, order);
                     System.out.println("Filtre Passe-haut Butterworth avec fréquence: " + frequency);
                     break;
             }
-            // Appeler la méthode de filtrage appropriée
-            // currentImage = FiltrageLineaireGlobal.filtrePasseBasButterworth(currentImage, frequency, order);
+
+            currentImage = convertToBufferedImage(result);
             displayImage(currentImage);
         }
     }

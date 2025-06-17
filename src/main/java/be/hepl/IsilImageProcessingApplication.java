@@ -532,35 +532,61 @@ public class IsilImageProcessingApplication extends JFrame {
         displayProcessedImage(processedImage);
 
     }
-    private void showImageParameters()
-    {
-        if (originalImage == null)
-        {
-            JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
-            return;
+
+
+    private void showImageParameters() {
+        StringBuilder message = new StringBuilder();
+
+        if (originalImage == null) {
+            message.append("Aucune image originale chargée.\n\n");
+        } else {
+            int[][] imageMatrix = convertToMatrix(originalImage);
+            int[] histAvant = Histogramme.Histogramme256(imageMatrix);
+
+            int min = Histogramme.minimum(imageMatrix);
+            int max = Histogramme.maximum(imageMatrix);
+            int lum = Histogramme.luminance(imageMatrix);
+            double cont1 = Histogramme.contraste1(imageMatrix);
+            double cont2 = Histogramme.contraste2(imageMatrix);
+
+            message.append("Paramètres de l'image originale:\n")
+                    .append(String.format("  Minimum: %d\n  Maximum: %d\n  Luminance: %d\n", min, max, lum))
+                    .append(String.format("  Contraste (écart-type): %.2f\n  Contraste (alternatif): %.2f\n\n", cont1, cont2));
         }
 
-        int[][] imageMatrix = convertToMatrix(originalImage);
+        if (processedImage == null) {
+            message.append("Aucune image traitée chargée.\n");
+        } else {
+            int[][] imageMatrix = convertToMatrix(processedImage);
+            int[] histApres = Histogramme.Histogramme256(imageMatrix);
 
+            int min = Histogramme.minimum(imageMatrix);
+            int max = Histogramme.maximum(imageMatrix);
+            int lum = Histogramme.luminance(imageMatrix);
+            double cont1 = Histogramme.contraste1(imageMatrix);
+            double cont2 = Histogramme.contraste2(imageMatrix);
 
-        int[] histAvant = Histogramme.Histogramme256(imageMatrix);
-        afficherHistogramme(histAvant, "Histogramme original");
+            message.append("Paramètres de l'image traitée:\n")
+                    .append(String.format("  Minimum: %d\n  Maximum: %d\n  Luminance: %d\n", min, max, lum))
+                    .append(String.format("  Contraste (écart-type): %.2f\n  Contraste (alternatif): %.2f\n", cont1, cont2));
+        }
 
-        int min = Histogramme.minimum(imageMatrix);
-        int max = Histogramme.maximum(imageMatrix);
-        int lum = Histogramme.luminance(imageMatrix);
-        double cont1 = Histogramme.contraste1(imageMatrix);
-        double cont2 = Histogramme.contraste2(imageMatrix);
+        // Crée une nouvelle JFrame pour afficher les résultats
+        JFrame frame = new JFrame("Paramètres de l'image");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(400, 300);
+        frame.setLocationRelativeTo(null); // Centre la fenêtre
 
-        String message = String.format(
-                "Paramètres de l'image:\n" +
-                        "Minimum: %d\nMaximum: %d\nLuminance: %d\n" +
-                        "Contraste (écart-type): %.2f\nContraste (alternatif): %.2f",
-                min, max, lum, cont1, cont2
-        );
+        JTextArea textArea = new JTextArea(message.toString());
+        textArea.setEditable(false);
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
 
-        JOptionPane.showMessageDialog(this, message, "Paramètres de l'image", JOptionPane.INFORMATION_MESSAGE);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        frame.add(scrollPane);
+
+        frame.setVisible(true);
     }
+
 
     private void showLinearTransformDialog() {
         if (originalImage == null)

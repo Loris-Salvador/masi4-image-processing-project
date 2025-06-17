@@ -323,7 +323,7 @@ public class IsilImageProcessingApplication extends JFrame {
 
                 result = MasqueConvolution.filtreMasqueConvolution(mat, mask);
                 processedImage = convertToBufferedImage(result);
-                displayImage(processedImage);
+                displayProcessedImage(processedImage);
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, "Format de masque invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
             }

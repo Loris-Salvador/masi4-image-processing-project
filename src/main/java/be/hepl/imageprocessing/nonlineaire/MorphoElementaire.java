@@ -13,7 +13,7 @@ public class MorphoElementaire
         {
             for (int x = 0; x < width; x++)
             {
-                int min = Integer.MAX_VALUE;
+                int min = Integer.MAX_VALUE; // 2147483647
                 for (int dy = -offset; dy <= offset; dy++)
                 {
                     for (int dx = -offset; dx <= offset; dx++)
@@ -43,7 +43,7 @@ public class MorphoElementaire
         {
             for (int x = 0; x < width; x++)
             {
-                int max = Integer.MIN_VALUE;
+                int max = Integer.MIN_VALUE; // -2 147 483 648
                 for (int dy = -offset; dy <= offset; dy++)
                 {
                     for (int dx = -offset; dx <= offset; dx++)

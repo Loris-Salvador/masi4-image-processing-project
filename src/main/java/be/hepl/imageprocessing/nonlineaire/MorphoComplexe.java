@@ -5,7 +5,8 @@ import java.util.Arrays;
 
 public class MorphoComplexe
 {
-    public static int[][] dilatationGeodesique(int[][] image, int[][] masqueGeodesique, int nbIter) {
+    public static int[][] dilatationGeodesique(int[][] image, int[][] masqueGeodesique, int nbIter)
+    {
         int[][] marqueur = copy(image);
 
         if (nbIter < 1)

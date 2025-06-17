@@ -31,7 +31,7 @@ import static be.hepl.imageprocessing.utils.ImageConverter.convertToMatrix;
 
 public class IsilImageProcessingApplication extends JFrame {
     private JLabel imageLabel;
-    private BufferedImage currentImage;
+    //private BufferedImage currentImage;
 
     private JLabel originalImageLabel;
     private JLabel processedImageLabel;
@@ -229,7 +229,7 @@ public class IsilImageProcessingApplication extends JFrame {
                 "Fréquence de coupure:", freqSpinner
         };
 
-        int[][] mat = convertToMatrix(currentImage);
+        int[][] mat = convertToMatrix(originalImage);
         int[][] result = mat;
 
 
@@ -251,8 +251,8 @@ public class IsilImageProcessingApplication extends JFrame {
                     break;
 
             }
-            currentImage = convertToBufferedImage(result);
-            displayProcessedImage(currentImage);
+            processedImage = convertToBufferedImage(result);
+            displayProcessedImage(processedImage);
         }
     }
 
@@ -260,7 +260,7 @@ public class IsilImageProcessingApplication extends JFrame {
         JSpinner freqSpinner = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
         JSpinner orderSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
 
-        int[][] mat = convertToMatrix(currentImage);
+        int[][] mat = convertToMatrix(originalImage);
         int[][] result = mat;
 
         Object[] message = {
@@ -285,8 +285,8 @@ public class IsilImageProcessingApplication extends JFrame {
                     break;
             }
 
-            currentImage = convertToBufferedImage(result);
-            displayProcessedImage(currentImage);
+            processedImage = convertToBufferedImage(result);
+            displayProcessedImage(processedImage);
         }
     }
 
@@ -297,7 +297,7 @@ public class IsilImageProcessingApplication extends JFrame {
         JTextArea maskArea = new JTextArea(5, 10);
         maskArea.setText("1 1 1\n1 1 1\n1 1 1");
 
-        int[][] mat = convertToMatrix(currentImage);
+        int[][] mat = convertToMatrix(originalImage);
         int[][] result = mat;
 
         Object[] message = {
@@ -322,8 +322,8 @@ public class IsilImageProcessingApplication extends JFrame {
                 }
 
                 result = MasqueConvolution.filtreMasqueConvolution(mat, mask);
-                currentImage = convertToBufferedImage(result);
-                displayImage(currentImage);
+                processedImage = convertToBufferedImage(result);
+                displayImage(processedImage);
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, "Format de masque invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
             }
@@ -333,7 +333,7 @@ public class IsilImageProcessingApplication extends JFrame {
     private void showAveragingDialog() {
         JSpinner sizeSpinner = new JSpinner(new SpinnerNumberModel(3, 3, 15, 2));
 
-        int[][] mat = convertToMatrix(currentImage);
+        int[][] mat = convertToMatrix(originalImage);
         int[][] result = mat;
 
         Object[] message = {
@@ -348,21 +348,20 @@ public class IsilImageProcessingApplication extends JFrame {
 
 
             result = FiltreMoyenneur.filtreMoyenneur(mat, size);
-            currentImage = convertToBufferedImage(result);
-            displayProcessedImage(currentImage);
+            processedImage = convertToBufferedImage(result);
+            displayProcessedImage(processedImage);
             // currentImage = FiltrageLineaireLocal.filtreMoyenneur(currentImage, size);
-            displayProcessedImage(currentImage);
         }
     }
 
     private void showMorphoDialog(String operation)
     {
-        if (currentImage == null)
+        if (originalImage == null)
         {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        int[][] mat = convertToMatrix(currentImage);
+        int[][] mat = convertToMatrix(originalImage);
         JSpinner sizeSpinner = new JSpinner(new SpinnerNumberModel(3, 3, 31, 2));
         Object[] message = {"Taille de l'élément structurant (impair):", sizeSpinner};
         int option = JOptionPane.showConfirmDialog(this, message, operation, JOptionPane.OK_CANCEL_OPTION);
@@ -386,8 +385,8 @@ public class IsilImageProcessingApplication extends JFrame {
             default:
                 return;
         }
-        currentImage = convertToBufferedImage(result);
-        displayProcessedImage(currentImage);
+        processedImage = convertToBufferedImage(result);
+        displayProcessedImage(processedImage);
     }
 
     private void openImage() {
@@ -401,8 +400,8 @@ public class IsilImageProcessingApplication extends JFrame {
 
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             try {
-                currentImage = ImageIO.read(fileChooser.getSelectedFile());
-                displayOriginalImage(currentImage);
+                originalImage = ImageIO.read(fileChooser.getSelectedFile());
+                displayOriginalImage(originalImage);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Erreur lors du chargement de l'image",
                         "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -411,7 +410,7 @@ public class IsilImageProcessingApplication extends JFrame {
     }
 
     private void saveImage() {
-        if (currentImage == null) {
+        if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image à enregistrer",
                     "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
@@ -423,7 +422,7 @@ public class IsilImageProcessingApplication extends JFrame {
 
         if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             try {
-                ImageIO.write(currentImage, "png", fileChooser.getSelectedFile());
+                ImageIO.write(processedImage, "png", fileChooser.getSelectedFile());
                 JOptionPane.showMessageDialog(this, "Image enregistrée avec succès");
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Erreur lors de l'enregistrement",
@@ -441,7 +440,7 @@ public class IsilImageProcessingApplication extends JFrame {
 
     // Méthodes pour les autres fonctionnalités (à compléter)
     private void showGeodesicDialog(String operation) {
-        if (currentImage == null)
+        if (originalImage == null)
         {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
@@ -457,8 +456,8 @@ public class IsilImageProcessingApplication extends JFrame {
             BufferedImage maskImage = ImageIO.read(fileChooser.getSelectedFile());
 
 
-            if (maskImage.getWidth() != currentImage.getWidth() ||
-                    maskImage.getHeight() != currentImage.getHeight())
+            if (maskImage.getWidth() != originalImage.getWidth() ||
+                    maskImage.getHeight() != originalImage.getHeight())
             {
                 JOptionPane.showMessageDialog(this,
                         "Le masque doit avoir la même taille que l'image originale",
@@ -467,7 +466,7 @@ public class IsilImageProcessingApplication extends JFrame {
             }
 
             int[][] masque = convertToMatrix(maskImage);
-            int[][] image = convertToMatrix(currentImage);
+            int[][] image = convertToMatrix(originalImage);
             int[][] result;
 
             if (operation.equals("Dilatation"))
@@ -487,8 +486,8 @@ public class IsilImageProcessingApplication extends JFrame {
             }
 
 
-            currentImage = convertToBufferedImage(result);
-            displayProcessedImage(currentImage);
+            processedImage = convertToBufferedImage(result);
+            displayProcessedImage(processedImage);
 
         }
         catch (IOException e)
@@ -499,7 +498,7 @@ public class IsilImageProcessingApplication extends JFrame {
     }
     private void showMedianDialog()
     {
-        if (currentImage == null)
+        if (originalImage == null)
         {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
@@ -518,30 +517,30 @@ public class IsilImageProcessingApplication extends JFrame {
 
         BufferedImage resultImage;
 
-        if (currentImage.getType() == BufferedImage.TYPE_BYTE_GRAY)
+        if (originalImage.getType() == BufferedImage.TYPE_BYTE_GRAY)
         {
-            int[][] matrix = convertToMatrix(currentImage);
+            int[][] matrix = convertToMatrix(originalImage);
             int[][] result = MorphoComplexe.filtreMedian(matrix, taille);
             resultImage = convertToBufferedImage(result);
         }
         else
         {
-            resultImage = filtreMedianCouleur(currentImage, taille);
+            resultImage = filtreMedianCouleur(originalImage, taille);
         }
 
-        currentImage = resultImage;
-        displayProcessedImage(currentImage);
+        processedImage = resultImage;
+        displayProcessedImage(processedImage);
 
     }
     private void showImageParameters()
     {
-        if (currentImage == null)
+        if (originalImage == null)
         {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int[][] imageMatrix = convertToMatrix(currentImage);
+        int[][] imageMatrix = convertToMatrix(originalImage);
 
 
         int[] histAvant = Histogramme.Histogramme256(imageMatrix);
@@ -564,13 +563,13 @@ public class IsilImageProcessingApplication extends JFrame {
     }
 
     private void showLinearTransformDialog() {
-        if (currentImage == null)
+        if (originalImage == null)
         {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int[][] imageMatrix = convertToMatrix(currentImage);
+        int[][] imageMatrix = convertToMatrix(originalImage);
 
         // Afficher histogramme avant
         int[] histAvant = Histogramme.Histogramme256(imageMatrix);
@@ -586,19 +585,19 @@ public class IsilImageProcessingApplication extends JFrame {
         int[] histApres = Histogramme.Histogramme256(result);
         afficherHistogramme(histApres, "Après transformation linéaire");
 
-        currentImage = convertToBufferedImage(result);
-        displayProcessedImage(currentImage);
+        processedImage = convertToBufferedImage(result);
+        displayProcessedImage(processedImage);
     }
 
     private void showSaturationDialog()
     {
-        if (currentImage == null)
+        if (originalImage == null)
         {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int[][] imageMatrix = convertToMatrix(currentImage);
+        int[][] imageMatrix = convertToMatrix(originalImage);
 
         // Afficher histogramme avant
         int[] histAvant = Histogramme.Histogramme256(imageMatrix);
@@ -635,19 +634,19 @@ public class IsilImageProcessingApplication extends JFrame {
             int[] histApres = Histogramme.Histogramme256(result);
             afficherHistogramme(histApres, "Après saturation");
 
-            currentImage = convertToBufferedImage(result);
-            displayProcessedImage(currentImage);
+            processedImage = convertToBufferedImage(result);
+            displayProcessedImage(processedImage);
         }
     }
 
     private void showGammaDialog() {
-        if (currentImage == null)
+        if (originalImage == null)
         {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int[][] imageMatrix = convertToMatrix(currentImage);
+        int[][] imageMatrix = convertToMatrix(originalImage);
 
         // Afficher histogramme avant
         int[] histAvant = Histogramme.Histogramme256(imageMatrix);
@@ -673,19 +672,19 @@ public class IsilImageProcessingApplication extends JFrame {
             int[] histApres = Histogramme.Histogramme256(result);
             afficherHistogramme(histApres, "Après correction gamma");
 
-            currentImage = convertToBufferedImage(result);
-            displayProcessedImage(currentImage);
+            processedImage = convertToBufferedImage(result);
+            displayProcessedImage(processedImage);
         }
     }
 
     private void applyNegative()
     {
-        if (currentImage == null) {
+        if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int[][] imageMatrix = convertToMatrix(currentImage);
+        int[][] imageMatrix = convertToMatrix(originalImage);
 
         // Afficher histogramme avant
         int[] histAvant = Histogramme.Histogramme256(imageMatrix);
@@ -698,18 +697,18 @@ public class IsilImageProcessingApplication extends JFrame {
         int[] histApres = Histogramme.Histogramme256(result);
         afficherHistogramme(histApres, "Après négatif");
 
-        currentImage = convertToBufferedImage(result);
-        displayProcessedImage(currentImage);
+        processedImage = convertToBufferedImage(result);
+        displayProcessedImage(processedImage);
     }
 
     private void applyHistogramEqualization()
     {
-        if (currentImage == null) {
+        if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int[][] imageMatrix = convertToMatrix(currentImage);
+        int[][] imageMatrix = convertToMatrix(originalImage);
 
         // Afficher histogramme avant
         int[] histAvant = Histogramme.Histogramme256(imageMatrix);
@@ -722,8 +721,8 @@ public class IsilImageProcessingApplication extends JFrame {
         int[] histApres = Histogramme.Histogramme256(result);
         afficherHistogramme(histApres, "Après égalisation");
 
-        currentImage = convertToBufferedImage(result);
-        displayProcessedImage(currentImage);
+        processedImage = convertToBufferedImage(result);
+        displayProcessedImage(processedImage);
     }
 
     // Méthode utilitaire pour afficher un histogramme
@@ -802,7 +801,7 @@ public class IsilImageProcessingApplication extends JFrame {
     }
 
     private void showPrewittDialog() {
-        if (currentImage == null) {
+        if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -825,20 +824,20 @@ public class IsilImageProcessingApplication extends JFrame {
         int dir = (choice == 0) ? 1 : 2;
 
         // Conversion image -> matrice
-        int[][] matrix = convertToMatrix(currentImage);
+        int[][] matrix = convertToMatrix(originalImage);
 
         // Application du filtre Prewitt
         int[][] result = gradientPrewitt(matrix, dir);
 
         // Conversion matrice -> BufferedImage
-        currentImage = convertToBufferedImage(result);
+        processedImage = convertToBufferedImage(result);
 
         // Affichage de l'image résultante
-        displayProcessedImage(currentImage);
+        displayProcessedImage(processedImage);
     }
 
     private void showSobelDialog() {
-        if (currentImage == null) {
+        if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -861,92 +860,92 @@ public class IsilImageProcessingApplication extends JFrame {
         int dir = (choice == 0) ? 1 : 2;
 
         // Conversion image -> matrice
-        int[][] matrix = convertToMatrix(currentImage);
+        int[][] matrix = convertToMatrix(originalImage);
 
         // Application du filtre Sobel
         int[][] result = gradientSobel(matrix, dir);
 
         // Conversion matrice -> BufferedImage
-        currentImage = convertToBufferedImage(result);
+        processedImage = convertToBufferedImage(result);
 
         // Affichage de l'image résultante
-        displayProcessedImage(currentImage);
+        displayProcessedImage(processedImage);
     }
 
     private void applyLaplacian4() {
-        if (currentImage == null) {
+        if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int[][] matrix = convertToMatrix(currentImage);
+        int[][] matrix = convertToMatrix(originalImage);
         int[][] result = laplacien4(matrix);
-        currentImage = convertToBufferedImage(result);
-        displayProcessedImage(currentImage);
+        processedImage = convertToBufferedImage(result);
+        displayProcessedImage(processedImage);
     }
 
     private void applyLaplacian8() {
-        if (currentImage == null) {
+        if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int[][] matrix = convertToMatrix(currentImage);
+        int[][] matrix = convertToMatrix(originalImage);
         int[][] result = laplacien8(matrix);
-        currentImage = convertToBufferedImage(result);
-        displayProcessedImage(currentImage);
+        processedImage = convertToBufferedImage(result);
+        displayProcessedImage(processedImage);
     }
 
     private void applyErosionGradient() {
-        if (currentImage == null) {
+        if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int[][] matrix = convertToMatrix(currentImage);
+        int[][] matrix = convertToMatrix(originalImage);
         int[][] result = gradientErosion(matrix);
-        currentImage = convertToBufferedImage(result);
-        displayProcessedImage(currentImage);
+        processedImage = convertToBufferedImage(result);
+        displayProcessedImage(processedImage);
     }
 
     private void applyDilationGradient() {
-        if (currentImage == null) {
+        if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int[][] matrix = convertToMatrix(currentImage);
+        int[][] matrix = convertToMatrix(originalImage);
         int[][] result = gradientDilatation(matrix);
-        currentImage = convertToBufferedImage(result);
-        displayProcessedImage(currentImage);
+        processedImage = convertToBufferedImage(result);
+        displayProcessedImage(processedImage);
     }
 
     private void applyBeucherGradient() {
-        if (currentImage == null) {
+        if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int[][] matrix = convertToMatrix(currentImage);
+        int[][] matrix = convertToMatrix(originalImage);
         int[][] result = gradientBeucher(matrix);
-        currentImage = convertToBufferedImage(result);
-        displayProcessedImage(currentImage);
+        processedImage = convertToBufferedImage(result);
+        displayProcessedImage(processedImage);
     }
 
     private void applyNonLinearLaplacian() {
-        if (currentImage == null) {
+        if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int[][] matrix = convertToMatrix(currentImage);
+        int[][] matrix = convertToMatrix(originalImage);
         int[][] result = laplacienNonLineaire(matrix);
-        currentImage = convertToBufferedImage(result);
-        displayProcessedImage(currentImage);
+        processedImage = convertToBufferedImage(result);
+        displayProcessedImage(processedImage);
     }
 
     private void showSimpleThresholdDialog() {
-        if (currentImage == null) {
+        if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -968,15 +967,15 @@ public class IsilImageProcessingApplication extends JFrame {
 
         if (option == JOptionPane.OK_OPTION) {
             int seuil = (Integer) seuilSpinner.getValue();
-            int[][] matrix = convertToMatrix(currentImage);
+            int[][] matrix = convertToMatrix(originalImage);
             int[][] result = seuillageSimple(matrix, seuil);
-            currentImage = convertToBufferedImage(result);
-            displayProcessedImage(currentImage);
+            processedImage = convertToBufferedImage(result);
+            displayProcessedImage(processedImage);
         }
     }
 
     private void showDoubleThresholdDialog() {
-        if (currentImage == null) {
+        if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -1001,23 +1000,23 @@ public class IsilImageProcessingApplication extends JFrame {
                 return;
             }
 
-            int[][] matrix = convertToMatrix(currentImage);
+            int[][] matrix = convertToMatrix(originalImage);
             int[][] result = Seuillage.seuillageDouble(matrix, seuil1, seuil2);
-            currentImage = convertToBufferedImage(result);
-            displayProcessedImage(currentImage);
+            processedImage = convertToBufferedImage(result);
+            displayProcessedImage(processedImage);
         }
     }
 
     private void applyAutoThreshold() {
-        if (currentImage == null) {
+        if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Aucune image chargée", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int[][] matrix = convertToMatrix(currentImage);
+        int[][] matrix = convertToMatrix(originalImage);
         int[][] result = Seuillage.seuillageAutomatique(matrix);
-        currentImage = convertToBufferedImage(result);
-        displayProcessedImage(currentImage);
+        processedImage = convertToBufferedImage(result);
+        displayProcessedImage(processedImage);
     }
 
     //Partie Loris ---------------------------------------------

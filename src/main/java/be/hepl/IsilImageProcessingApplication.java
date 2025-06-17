@@ -33,11 +33,16 @@ public class IsilImageProcessingApplication extends JFrame {
     private JLabel imageLabel;
     private BufferedImage currentImage;
 
+    private JLabel originalImageLabel;
+    private JLabel processedImageLabel;
+    private BufferedImage originalImage;
+    private BufferedImage processedImage;
+
     public IsilImageProcessingApplication() {
         // Configuration de la fenêtre principale
         setTitle("IsilImageProcessing");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 700);
+        setSize(1400, 700);
         setLocationRelativeTo(null);
 
         String projectPath = System.getProperty("user.dir");
@@ -46,16 +51,64 @@ public class IsilImageProcessingApplication extends JFrame {
         JMenuBar menuBar = createMenuBar();
         setJMenuBar(menuBar);
 
-        imageLabel = new JLabel();
-        imageLabel.setHorizontalAlignment(JLabel.CENTER);
-        JScrollPane scrollPane = new JScrollPane(imageLabel);
+        // Création des labels pour les images
+        originalImageLabel = new JLabel("Image Originale");
+        originalImageLabel.setHorizontalAlignment(JLabel.CENTER);
+        originalImageLabel.setVerticalAlignment(JLabel.CENTER);
+        originalImageLabel.setBorder(BorderFactory.createTitledBorder("Image Originale"));
+        originalImageLabel.setPreferredSize(new Dimension(600, 500));
 
-        // Ajout des composants à la fenêtre
-        add(scrollPane, BorderLayout.CENTER);
+        processedImageLabel = new JLabel("Image Traitée");
+        processedImageLabel.setHorizontalAlignment(JLabel.CENTER);
+        processedImageLabel.setVerticalAlignment(JLabel.CENTER);
+        processedImageLabel.setBorder(BorderFactory.createTitledBorder("Image Traitée"));
+        processedImageLabel.setPreferredSize(new Dimension(600, 500));
 
-        // Charger une image par défaut (optionnel)
-        // currentImage = ImageIO.read(new File("lena.jpg"));
-        // displayImage(currentImage);
+        // Création des scroll panes pour chaque image
+        JScrollPane originalScrollPane = new JScrollPane(originalImageLabel);
+        originalScrollPane.setPreferredSize(new Dimension(650, 550));
+
+        JScrollPane processedScrollPane = new JScrollPane(processedImageLabel);
+        processedScrollPane.setPreferredSize(new Dimension(650, 550));
+
+        // Panneau principal avec les deux slots
+        JPanel mainPanel = new JPanel(new GridLayout(1, 2, 10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        mainPanel.add(originalScrollPane);
+        mainPanel.add(processedScrollPane);
+
+        // Ajout du panneau principal à la fenêtre
+        add(mainPanel, BorderLayout.CENTER);
+    }
+
+    // Méthode pour afficher l'image originale
+    public void displayOriginalImage(BufferedImage image) {
+        this.originalImage = image;
+        if (image != null) {
+            ImageIcon icon = new ImageIcon(image);
+            originalImageLabel.setIcon(icon);
+            originalImageLabel.setText("");
+        } else {
+            originalImageLabel.setIcon(null);
+            originalImageLabel.setText("Image Originale");
+        }
+        displayProcessedImage(null);
+        repaint();
+
+    }
+
+    // Méthode pour afficher l'image traitée
+    public void displayProcessedImage(BufferedImage image) {
+        this.processedImage = image;
+        if (image != null) {
+            ImageIcon icon = new ImageIcon(image);
+            processedImageLabel.setIcon(icon);
+            processedImageLabel.setText("");
+        } else {
+            processedImageLabel.setIcon(null);
+            processedImageLabel.setText("Image Traitée");
+        }
+        repaint();
     }
 
     private JMenuBar createMenuBar() {
@@ -199,7 +252,7 @@ public class IsilImageProcessingApplication extends JFrame {
 
             }
             currentImage = convertToBufferedImage(result);
-            displayImage(currentImage);
+            displayProcessedImage(currentImage);
         }
     }
 
@@ -233,7 +286,7 @@ public class IsilImageProcessingApplication extends JFrame {
             }
 
             currentImage = convertToBufferedImage(result);
-            displayImage(currentImage);
+            displayProcessedImage(currentImage);
         }
     }
 
@@ -296,9 +349,9 @@ public class IsilImageProcessingApplication extends JFrame {
 
             result = FiltreMoyenneur.filtreMoyenneur(mat, size);
             currentImage = convertToBufferedImage(result);
-            displayImage(currentImage);
+            displayProcessedImage(currentImage);
             // currentImage = FiltrageLineaireLocal.filtreMoyenneur(currentImage, size);
-            displayImage(currentImage);
+            displayProcessedImage(currentImage);
         }
     }
 
@@ -334,7 +387,7 @@ public class IsilImageProcessingApplication extends JFrame {
                 return;
         }
         currentImage = convertToBufferedImage(result);
-        displayImage(currentImage);
+        displayProcessedImage(currentImage);
     }
 
     private void openImage() {
@@ -349,7 +402,7 @@ public class IsilImageProcessingApplication extends JFrame {
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             try {
                 currentImage = ImageIO.read(fileChooser.getSelectedFile());
-                displayImage(currentImage);
+                displayOriginalImage(currentImage);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Erreur lors du chargement de l'image",
                         "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -435,7 +488,7 @@ public class IsilImageProcessingApplication extends JFrame {
 
 
             currentImage = convertToBufferedImage(result);
-            displayImage(currentImage);
+            displayProcessedImage(currentImage);
 
         }
         catch (IOException e)
@@ -477,7 +530,7 @@ public class IsilImageProcessingApplication extends JFrame {
         }
 
         currentImage = resultImage;
-        displayImage(currentImage);
+        displayProcessedImage(currentImage);
 
     }
     private void showImageParameters()
@@ -534,7 +587,7 @@ public class IsilImageProcessingApplication extends JFrame {
         afficherHistogramme(histApres, "Après transformation linéaire");
 
         currentImage = convertToBufferedImage(result);
-        displayImage(currentImage);
+        displayProcessedImage(currentImage);
     }
 
     private void showSaturationDialog()
@@ -583,7 +636,7 @@ public class IsilImageProcessingApplication extends JFrame {
             afficherHistogramme(histApres, "Après saturation");
 
             currentImage = convertToBufferedImage(result);
-            displayImage(currentImage);
+            displayProcessedImage(currentImage);
         }
     }
 
@@ -621,7 +674,7 @@ public class IsilImageProcessingApplication extends JFrame {
             afficherHistogramme(histApres, "Après correction gamma");
 
             currentImage = convertToBufferedImage(result);
-            displayImage(currentImage);
+            displayProcessedImage(currentImage);
         }
     }
 
@@ -646,7 +699,7 @@ public class IsilImageProcessingApplication extends JFrame {
         afficherHistogramme(histApres, "Après négatif");
 
         currentImage = convertToBufferedImage(result);
-        displayImage(currentImage);
+        displayProcessedImage(currentImage);
     }
 
     private void applyHistogramEqualization()
@@ -670,7 +723,7 @@ public class IsilImageProcessingApplication extends JFrame {
         afficherHistogramme(histApres, "Après égalisation");
 
         currentImage = convertToBufferedImage(result);
-        displayImage(currentImage);
+        displayProcessedImage(currentImage);
     }
 
     // Méthode utilitaire pour afficher un histogramme
@@ -781,7 +834,7 @@ public class IsilImageProcessingApplication extends JFrame {
         currentImage = convertToBufferedImage(result);
 
         // Affichage de l'image résultante
-        displayImage(currentImage);
+        displayProcessedImage(currentImage);
     }
 
     private void showSobelDialog() {
@@ -817,7 +870,7 @@ public class IsilImageProcessingApplication extends JFrame {
         currentImage = convertToBufferedImage(result);
 
         // Affichage de l'image résultante
-        displayImage(currentImage);
+        displayProcessedImage(currentImage);
     }
 
     private void applyLaplacian4() {
@@ -829,7 +882,7 @@ public class IsilImageProcessingApplication extends JFrame {
         int[][] matrix = convertToMatrix(currentImage);
         int[][] result = laplacien4(matrix);
         currentImage = convertToBufferedImage(result);
-        displayImage(currentImage);
+        displayProcessedImage(currentImage);
     }
 
     private void applyLaplacian8() {
@@ -841,7 +894,7 @@ public class IsilImageProcessingApplication extends JFrame {
         int[][] matrix = convertToMatrix(currentImage);
         int[][] result = laplacien8(matrix);
         currentImage = convertToBufferedImage(result);
-        displayImage(currentImage);
+        displayProcessedImage(currentImage);
     }
 
     private void applyErosionGradient() {
@@ -853,7 +906,7 @@ public class IsilImageProcessingApplication extends JFrame {
         int[][] matrix = convertToMatrix(currentImage);
         int[][] result = gradientErosion(matrix);
         currentImage = convertToBufferedImage(result);
-        displayImage(currentImage);
+        displayProcessedImage(currentImage);
     }
 
     private void applyDilationGradient() {
@@ -865,7 +918,7 @@ public class IsilImageProcessingApplication extends JFrame {
         int[][] matrix = convertToMatrix(currentImage);
         int[][] result = gradientDilatation(matrix);
         currentImage = convertToBufferedImage(result);
-        displayImage(currentImage);
+        displayProcessedImage(currentImage);
     }
 
     private void applyBeucherGradient() {
@@ -877,7 +930,7 @@ public class IsilImageProcessingApplication extends JFrame {
         int[][] matrix = convertToMatrix(currentImage);
         int[][] result = gradientBeucher(matrix);
         currentImage = convertToBufferedImage(result);
-        displayImage(currentImage);
+        displayProcessedImage(currentImage);
     }
 
     private void applyNonLinearLaplacian() {
@@ -889,7 +942,7 @@ public class IsilImageProcessingApplication extends JFrame {
         int[][] matrix = convertToMatrix(currentImage);
         int[][] result = laplacienNonLineaire(matrix);
         currentImage = convertToBufferedImage(result);
-        displayImage(currentImage);
+        displayProcessedImage(currentImage);
     }
 
     private void showSimpleThresholdDialog() {
@@ -918,7 +971,7 @@ public class IsilImageProcessingApplication extends JFrame {
             int[][] matrix = convertToMatrix(currentImage);
             int[][] result = seuillageSimple(matrix, seuil);
             currentImage = convertToBufferedImage(result);
-            displayImage(currentImage);
+            displayProcessedImage(currentImage);
         }
     }
 
@@ -951,7 +1004,7 @@ public class IsilImageProcessingApplication extends JFrame {
             int[][] matrix = convertToMatrix(currentImage);
             int[][] result = Seuillage.seuillageDouble(matrix, seuil1, seuil2);
             currentImage = convertToBufferedImage(result);
-            displayImage(currentImage);
+            displayProcessedImage(currentImage);
         }
     }
 
@@ -964,7 +1017,7 @@ public class IsilImageProcessingApplication extends JFrame {
         int[][] matrix = convertToMatrix(currentImage);
         int[][] result = Seuillage.seuillageAutomatique(matrix);
         currentImage = convertToBufferedImage(result);
-        displayImage(currentImage);
+        displayProcessedImage(currentImage);
     }
 
     //Partie Loris ---------------------------------------------

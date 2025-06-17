@@ -276,7 +276,7 @@ public class IsilImageProcessingApplication extends JFrame {
             int order = (Integer)orderSpinner.getValue();
             switch (filterType){
                 case "Passe-bas Butterworth":
-                    result = GlobalFilter.applyButterworthLowPassFilter(mat, frequency, 1);
+                    result = GlobalFilter.applyButterworthLowPassFilter(mat, frequency, order);
                     System.out.println("Filtre Passe-bas Butterworth avec fréquence: " + frequency);
                     break;
                 case "Passe-haut Butterworth":

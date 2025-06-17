@@ -53,9 +53,11 @@ public class GlobalFilter {
                 filterHighPass(freq, tailleMasque);
                 break;
             case 2: // Filtre passe-bas Butterworth
+                System.out.println("Applying Butterworth Low Pass Filter with cutoff frequency: " + frequenceCoupure + " and order: " + ordre);
                 filterButterworthLowPass(freq, frequenceCoupure, ordre);
                 break;
             case 3: // Filtre passe-haut Butterworth
+                System.out.println("Applying Butterworth High Pass Filter with cutoff frequency: " + frequenceCoupure + " and order: " + ordre);
                 filterButterworthHighPass(freq, frequenceCoupure, ordre);
                 break;
         }

@@ -16,6 +16,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -535,56 +537,144 @@ public class IsilImageProcessingApplication extends JFrame {
 
 
     private void showImageParameters() {
-        StringBuilder message = new StringBuilder();
-
-        if (originalImage == null) {
-            message.append("Aucune image originale chargée.\n\n");
-        } else {
-            int[][] imageMatrix = convertToMatrix(originalImage);
-            int[] histAvant = Histogramme.Histogramme256(imageMatrix);
-
-            int min = Histogramme.minimum(imageMatrix);
-            int max = Histogramme.maximum(imageMatrix);
-            int lum = Histogramme.luminance(imageMatrix);
-            double cont1 = Histogramme.contraste1(imageMatrix);
-            double cont2 = Histogramme.contraste2(imageMatrix);
-
-            message.append("Paramètres de l'image originale:\n")
-                    .append(String.format("  Minimum: %d\n  Maximum: %d\n  Luminance: %d\n", min, max, lum))
-                    .append(String.format("  Contraste (écart-type): %.2f\n  Contraste (alternatif): %.2f\n\n", cont1, cont2));
-        }
-
-        if (processedImage == null) {
-            message.append("Aucune image traitée chargée.\n");
-        } else {
-            int[][] imageMatrix = convertToMatrix(processedImage);
-            int[] histApres = Histogramme.Histogramme256(imageMatrix);
-
-            int min = Histogramme.minimum(imageMatrix);
-            int max = Histogramme.maximum(imageMatrix);
-            int lum = Histogramme.luminance(imageMatrix);
-            double cont1 = Histogramme.contraste1(imageMatrix);
-            double cont2 = Histogramme.contraste2(imageMatrix);
-
-            message.append("Paramètres de l'image traitée:\n")
-                    .append(String.format("  Minimum: %d\n  Maximum: %d\n  Luminance: %d\n", min, max, lum))
-                    .append(String.format("  Contraste (écart-type): %.2f\n  Contraste (alternatif): %.2f\n", cont1, cont2));
-        }
-
-        // Crée une nouvelle JFrame pour afficher les résultats
-        JFrame frame = new JFrame("Paramètres de l'image");
+        JFrame frame = new JFrame("Analyse des Paramètres d'Image");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(400, 300);
-        frame.setLocationRelativeTo(null); // Centre la fenêtre
+        frame.setSize(600, 500);
+        frame.setLocationRelativeTo(null);
 
-        JTextArea textArea = new JTextArea(message.toString());
-        textArea.setEditable(false);
-        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        // Panel principal avec padding
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        mainPanel.setBackground(new Color(248, 249, 250));
 
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        frame.add(scrollPane);
+        // Titre
+        JLabel titleLabel = new JLabel("Analyse des Paramètres d'Image", JLabel.CENTER);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        titleLabel.setForeground(new Color(33, 37, 41));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
 
+        // Panel de contenu avec deux colonnes
+        JPanel contentPanel = new JPanel(new GridLayout(1, 2, 15, 0));
+        contentPanel.setOpaque(false);
+
+        // Panel pour l'image originale
+        JPanel originalPanel = createImageParametersPanel("Image Originale", originalImage, new Color(52, 144, 220));
+
+        // Panel pour l'image traitée
+        JPanel processedPanel = createImageParametersPanel("Image Traitée", processedImage, new Color(40, 167, 69));
+
+        contentPanel.add(originalPanel);
+        contentPanel.add(processedPanel);
+
+        // Bouton de fermeture stylisé
+        JButton closeButton = new JButton("Fermer");
+        styleButton(closeButton);
+        closeButton.addActionListener(e -> frame.dispose());
+
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(closeButton);
+
+        // Assemblage
+        mainPanel.add(titleLabel, BorderLayout.NORTH);
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        frame.add(mainPanel);
         frame.setVisible(true);
+    }
+
+    private JPanel createImageParametersPanel(String title, BufferedImage image, Color accentColor) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(222, 226, 230), 1),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
+
+        // Titre du panel avec couleur d'accent
+        JLabel titleLabel = new JLabel(title, JLabel.CENTER);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        titleLabel.setForeground(accentColor);
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+
+        if (image == null) {
+            JLabel noImageLabel = new JLabel("Aucune image chargée", JLabel.CENTER);
+            noImageLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+            noImageLabel.setForeground(new Color(108, 117, 125));
+
+            panel.add(titleLabel, BorderLayout.NORTH);
+            panel.add(noImageLabel, BorderLayout.CENTER);
+        } else {
+            // Calcul des paramètres
+            int[][] imageMatrix = convertToMatrix(image);
+            int min = Histogramme.minimum(imageMatrix);
+            int max = Histogramme.maximum(imageMatrix);
+            int lum = Histogramme.luminance(imageMatrix);
+            double cont1 = Histogramme.contraste1(imageMatrix);
+            double cont2 = Histogramme.contraste2(imageMatrix);
+
+            // Panel des paramètres avec un layout en grille
+            JPanel paramsPanel = new JPanel(new GridBagLayout());
+            paramsPanel.setOpaque(false);
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(5, 0, 5, 0);
+            gbc.anchor = GridBagConstraints.WEST;
+
+            // Ajout des paramètres avec style
+            addParameterRow(paramsPanel, gbc, 0, "Minimum:", String.valueOf(min), new Color(220, 53, 69));
+            addParameterRow(paramsPanel, gbc, 1, "Maximum:", String.valueOf(max), new Color(40, 167, 69));
+            addParameterRow(paramsPanel, gbc, 2, "Luminance:", String.valueOf(lum), new Color(255, 193, 7));
+            addParameterRow(paramsPanel, gbc, 3, "Contraste 1:", String.format("%.2f", cont1), new Color(102, 16, 242));
+            addParameterRow(paramsPanel, gbc, 4, "Contraste 2:", String.format("%.2f", cont2), new Color(111, 66, 193));
+
+            panel.add(titleLabel, BorderLayout.NORTH);
+            panel.add(paramsPanel, BorderLayout.CENTER);
+        }
+
+        return panel;
+    }
+
+    private void addParameterRow(JPanel parent, GridBagConstraints gbc, int row, String label, String value, Color valueColor) {
+        gbc.gridy = row;
+
+        // Label du paramètre
+        gbc.gridx = 0;
+        gbc.weightx = 0.6;
+        JLabel paramLabel = new JLabel(label);
+        paramLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        paramLabel.setForeground(new Color(73, 80, 87));
+        parent.add(paramLabel, gbc);
+
+        // Valeur du paramètre
+        gbc.gridx = 1;
+        gbc.weightx = 0.4;
+        JLabel valueLabel = new JLabel(value);
+        valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        valueLabel.setForeground(valueColor);
+        parent.add(valueLabel, gbc);
+    }
+
+    private void styleButton(JButton button) {
+        button.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        button.setBackground(new Color(52, 144, 220));
+        button.setForeground(Color.WHITE);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+        button.setFocusPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Effet hover
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(new Color(40, 120, 180));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(new Color(52, 144, 220));
+            }
+        });
     }
 
 

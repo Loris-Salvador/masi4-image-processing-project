@@ -1277,9 +1277,9 @@ public class IsilImageProcessingApplication extends JFrame {
 
             int[][] binaryBlue = be.hepl.imageprocessing.applications.Seuillage.seuillageBleu(image);
 
-            binaryRed = MorphoElementaire.erosion(binaryRed, 5);
+            binaryRed = MorphoElementaire.ouverture(binaryRed, 5);
 
-            binaryBlue = MorphoElementaire.erosion(binaryBlue, 5);
+            binaryBlue = MorphoElementaire.ouverture(binaryBlue, 5);
 
             BufferedImage BinaryRedImage = Helper.matriceBinaireVersImage(binaryRed);
 
@@ -1400,6 +1400,7 @@ public class IsilImageProcessingApplication extends JFrame {
             int[][] seuillageAuto = Seuillage.seuillageAutomatique(matrix);
             //afficherImageDialog(this, ImageConverter.convertToBufferedImage(seuillageAuto), "seuillageAuto", location.x, location.y);
 
+            //TXT
             int[][] petitVaisseau = MorphoElementaire.erosion(seuillageAuto, 15);
             int[][] reconstructionVaisseaux = MorphoComplexe.reconstructionGeodesique(petitVaisseau, seuillageAuto);
             //afficherImageDialog(this, ImageConverter.convertToBufferedImage(reconstructionVaisseaux), "reconstructionVaisseaux", location.x, location.y);

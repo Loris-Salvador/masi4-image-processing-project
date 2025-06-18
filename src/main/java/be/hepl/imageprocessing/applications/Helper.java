@@ -74,24 +74,6 @@ public class Helper {
         return image;
     }
 
-    public static int[][] convertirEnNiveauDeGris(BufferedImage image) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-        int[][] gris = new int[height][width];
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int rgb = image.getRGB(x, y);
-                int r = (rgb >> 16) & 0xFF;
-                int g = (rgb >> 8) & 0xFF;
-                int b = rgb & 0xFF;
-                // Calcul de la luminance avec pondération classique
-                gris[y][x] = (int)(0.3 * r + 0.59 * g + 0.11 * b);
-            }
-        }
-        return gris;
-    }
-
 
     public static int[][] getLuminance(BufferedImage image) {
 

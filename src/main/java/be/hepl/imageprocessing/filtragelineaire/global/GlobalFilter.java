@@ -1,12 +1,12 @@
-package be.hepl.imageprocessing.filtragelineaire.Global;
+package be.hepl.imageprocessing.filtragelineaire.global;
 
-import be.hepl.imageprocessing.filtragelineaire.Complexe.Complex;
-import be.hepl.imageprocessing.filtragelineaire.DFT.Fourier;
+import be.hepl.imageprocessing.filtragelineaire.complex.Complex;
+import be.hepl.imageprocessing.filtragelineaire.dft.Fourier;
 
-import static be.hepl.imageprocessing.filtragelineaire.Global.LowPassButterworthFilter.filterButterworthLowPass;
-import static be.hepl.imageprocessing.filtragelineaire.Global.HighPassButterworthFilter.filterButterworthHighPass;
-import static be.hepl.imageprocessing.filtragelineaire.Global.HighPassFilter.filterHighPass;
-import static be.hepl.imageprocessing.filtragelineaire.Global.LowPassFilter.filterLowPass;
+import static be.hepl.imageprocessing.filtragelineaire.global.LowPassButterworthFilter.filterButterworthLowPass;
+import static be.hepl.imageprocessing.filtragelineaire.global.HighPassButterworthFilter.filterButterworthHighPass;
+import static be.hepl.imageprocessing.filtragelineaire.global.HighPassFilter.filterHighPass;
+import static be.hepl.imageprocessing.filtragelineaire.global.LowPassFilter.filterLowPass;
 
 public class GlobalFilter {
 

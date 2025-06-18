@@ -1,4 +1,4 @@
-package be.hepl.imageprocessing.filtragelineaire.Complexe;
+package be.hepl.imageprocessing.filtragelineaire.complex;
 // class Complex de Florian
 public class Complex {
     double real;

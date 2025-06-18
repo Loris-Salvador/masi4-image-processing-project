@@ -1,11 +1,12 @@
 package be.hepl;
 
 import be.hepl.imageprocessing.applications.Helper;
+import be.hepl.imageprocessing.applications.SeuillageCouleur;
 import be.hepl.imageprocessing.contours.ContoursLineaire;
 import be.hepl.imageprocessing.contours.ContoursNonLineaire;
-import be.hepl.imageprocessing.filtragelineaire.Global.GlobalFilter;
-import be.hepl.imageprocessing.filtragelineaire.Local.FiltreMoyenneur;
-import be.hepl.imageprocessing.filtragelineaire.Local.MasqueConvolution;
+import be.hepl.imageprocessing.filtragelineaire.global.GlobalFilter;
+import be.hepl.imageprocessing.filtragelineaire.local.FiltreMoyenneur;
+import be.hepl.imageprocessing.filtragelineaire.local.MasqueConvolution;
 import be.hepl.imageprocessing.histogramme.Histogramme;
 import be.hepl.imageprocessing.nonlineaire.MorphoComplexe;
 import be.hepl.imageprocessing.nonlineaire.MorphoElementaire;
@@ -188,11 +189,11 @@ public class IsilImageProcessingApplication extends JFrame {
 
         menuBar.add(contoursMenu);
 
-        // Menu Seuillage
-        JMenu thresholdMenu = new JMenu("Seuillage");
-        thresholdMenu.add(createMenuItem("Seuillage simple", e -> showSimpleThresholdDialog()));
-        thresholdMenu.add(createMenuItem("Seuillage double", e -> showDoubleThresholdDialog()));
-        thresholdMenu.add(createMenuItem("Seuillage automatique", e -> applyAutoThreshold()));
+        // Menu SeuillageCouleur
+        JMenu thresholdMenu = new JMenu("SeuillageCouleur");
+        thresholdMenu.add(createMenuItem("SeuillageCouleur simple", e -> showSimpleThresholdDialog()));
+        thresholdMenu.add(createMenuItem("SeuillageCouleur double", e -> showDoubleThresholdDialog()));
+        thresholdMenu.add(createMenuItem("SeuillageCouleur automatique", e -> applyAutoThreshold()));
         menuBar.add(thresholdMenu);
 
         // Menu Applications
@@ -1076,7 +1077,7 @@ public class IsilImageProcessingApplication extends JFrame {
         int option = JOptionPane.showConfirmDialog(
                 this,
                 message,
-                "Seuillage simple",
+                "SeuillageCouleur simple",
                 JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.PLAIN_MESSAGE
         );
@@ -1104,7 +1105,7 @@ public class IsilImageProcessingApplication extends JFrame {
                 "Seuil haut :", seuil2Spinner
         };
 
-        int option = JOptionPane.showConfirmDialog(this, message, "Seuillage double",
+        int option = JOptionPane.showConfirmDialog(this, message, "SeuillageCouleur double",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (option == JOptionPane.OK_OPTION) {
@@ -1273,9 +1274,9 @@ public class IsilImageProcessingApplication extends JFrame {
         try {
             BufferedImage image = ImageIO.read(new File(projectPath + "/assets/ImageEtape5/petitsPois.png"));
 
-            int[][] binaryRed = be.hepl.imageprocessing.applications.Seuillage.seuillageRouge(image);
+            int[][] binaryRed = SeuillageCouleur.seuillageRouge(image);
 
-            int[][] binaryBlue = be.hepl.imageprocessing.applications.Seuillage.seuillageBleu(image);
+            int[][] binaryBlue = SeuillageCouleur.seuillageBleu(image);
 
             binaryRed = MorphoElementaire.ouverture(binaryRed, 5);
 
@@ -1493,11 +1494,11 @@ public class IsilImageProcessingApplication extends JFrame {
             // Calcul de l'amplitude du gradient
             int[][] amplitude = Helper.amplitudeGradient(gradientHor, gradientVer);
 
-            // Seuillage automatique sur l'amplitude
+            // SeuillageCouleur automatique sur l'amplitude
             int[][] seuillageAuto = Seuillage.seuillageAutomatique(amplitude);
 
 
-            afficherImageDialog(this, ImageConverter.convertToBufferedImage(seuillageAuto), "Seuillage automatique", location.x + 50, location.y + 50);
+            afficherImageDialog(this, ImageConverter.convertToBufferedImage(seuillageAuto), "SeuillageCouleur automatique", location.x + 50, location.y + 50);
 
             // Maintenant on trace les contours verts sur l'image originale
             int hauteurContour = seuillageAuto.length;

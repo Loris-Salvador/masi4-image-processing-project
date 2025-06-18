@@ -1,6 +1,6 @@
-package be.hepl.imageprocessing.filtragelineaire.DFT;
+package be.hepl.imageprocessing.filtragelineaire.dft;
 
-import be.hepl.imageprocessing.filtragelineaire.Complexe.Complex;
+import be.hepl.imageprocessing.filtragelineaire.complex.Complex;
 
 public class Fourier {
 

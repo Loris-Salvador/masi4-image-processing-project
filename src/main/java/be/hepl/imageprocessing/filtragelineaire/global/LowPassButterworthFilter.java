@@ -1,6 +1,6 @@
-package be.hepl.imageprocessing.filtragelineaire.Global;
+package be.hepl.imageprocessing.filtragelineaire.global;
 
-import be.hepl.imageprocessing.filtragelineaire.Complexe.Complex;
+import be.hepl.imageprocessing.filtragelineaire.complex.Complex;
 
 public class LowPassButterworthFilter {
 

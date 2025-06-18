@@ -1,4 +1,4 @@
-package be.hepl.imageprocessing.filtragelineaire.Complexe;
+package be.hepl.imageprocessing.filtragelineaire.complex;
 
 public class MatriceComplex {
     private Complex m[][];

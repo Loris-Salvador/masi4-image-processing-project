@@ -1,6 +1,6 @@
-package be.hepl.imageprocessing.filtragelineaire.Local;
+package be.hepl.imageprocessing.filtragelineaire.local;
 
-import static be.hepl.imageprocessing.filtragelineaire.Local.MasqueConvolution.filtreMasqueConvolution;
+import static be.hepl.imageprocessing.filtragelineaire.local.MasqueConvolution.filtreMasqueConvolution;
 
 public class FiltreMoyenneur {
 

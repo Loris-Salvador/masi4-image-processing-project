@@ -2,7 +2,7 @@ package be.hepl.imageprocessing.applications;
 
 import java.awt.image.BufferedImage;
 
-public class Seuillage {
+public class SeuillageCouleur {
     public static int[][] seuillageRouge(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();
@@ -15,7 +15,7 @@ public class Seuillage {
                 int g = (rgb >> 8) & 0xFF;
                 int b = rgb & 0xFF;
 
-                // Seuillage rouge
+                // SeuillageCouleur rouge
                 if (r > 150 && g < 100 && b < 100)
                     binaire[y][x] = 1;
                 else
